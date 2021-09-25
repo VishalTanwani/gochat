@@ -1,4 +1,4 @@
-module github.com/VishalTanwani/gochat
+module github.com/VishalTanwani/gochat/socket
 
 go 1.15
 

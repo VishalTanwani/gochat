@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gochat/socket/websocket"
+	"github.com/VishalTanwani/gochat/socket/websocket"
 	"log"
 	"net/http"
 )
@@ -17,7 +17,7 @@ func wsServer(server *websocket.Server, w http.ResponseWriter, r *http.Request) 
 		fmt.Println("at main.go wsServer 1", err)
 		return
 	}
-	
+
 	client := websocket.NewClient("", conn, server)
 	go client.Read()
 	server.Register <- client
