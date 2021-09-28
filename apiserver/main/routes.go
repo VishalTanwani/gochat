@@ -9,7 +9,7 @@ import (
 
 func routes() http.Handler {
 	mux := chi.NewRouter()
-	mux.Get("/people",handler.Repo.GetAllPeople)
+	mux.Post("/register",handler.Repo.RegisterUser)
 	return mux
 
 }

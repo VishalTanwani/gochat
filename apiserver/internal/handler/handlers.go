@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"strings"
+	"time"
 	"fmt"
 	"net/http"
 	"encoding/json"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
+	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
 	"github.com/VishalTanwani/gochat/apiserver/internal/repository"
 	"github.com/VishalTanwani/gochat/apiserver/internal/repository/dbrepo"
@@ -28,17 +31,25 @@ func NewRepo(a *config.AppConfig, db *driver.DB) {
 }
 
 
-//GetAllPeople will return all people data in collections
-func (m *Repository) GetAllPeople(w http.ResponseWriter, r *http.Request) {
+//RegisterUser will register the user in our data base
+func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
-	fmt.Println("routes to handler")
-	persons,err := m.DB.GetPeople()
+	var user models.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
+	user.Name = strings.Split(user.Email,"@")[0]
+	fmt.Println(user)
+	if err!=nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
+		return
+	}
+	userID,err := m.DB.RegisterUser(user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
 		return
 	}
-	fmt.Println(persons)
-	json.NewEncoder(w).Encode(persons)
-
+	json.NewEncoder(w).Encode(userID)
 }

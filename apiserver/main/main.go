@@ -14,6 +14,8 @@ const port = ":4000"
 var app config.AppConfig
 
 func main(){
+	fmt.Println("api server")
+	fmt.Println("server is running at", port)
 	db, err := run()
 	if err != nil {
 		log.Println("error at run in main", err)
@@ -26,8 +28,6 @@ func main(){
 		}
 	}()
 
-	fmt.Println("api server")
-	fmt.Println("server is running at", port)
 
 	server := &http.Server{
 		Addr:    port,
@@ -46,13 +46,11 @@ func run() (*driver.DB, error)  {
 	name := "vishal"
 	pass:="0109"
 	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@gochat.gcc8h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", name,pass)
-	fmt.Println(connectionString)
 	db, err := driver.ConnectMongo(connectionString)
 	if err != nil {
 		log.Fatal("cannot connect to database ", err)
 		return nil,err
 	}
-	fmt.Println(*db)
 	handler.NewRepo(&app, db)
 	return db,nil
 

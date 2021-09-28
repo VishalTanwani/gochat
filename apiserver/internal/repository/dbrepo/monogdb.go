@@ -4,30 +4,37 @@ import (
 	"fmt"
 	"time"
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
+	// "go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 )
 
-func (m *mongoDBRepo) GetPeople() ([]models.Person, error) {
-	var persons []models.Person
-	collection := m.DB.Database("test").Collection("people")
-	fmt.Println("collection",*collection)
+//RegisterUser will register a user
+func (m *mongoDBRepo) RegisterUser(user models.User) (interface{}, error) {
+	collection := m.DB.Database("gochat").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cursor, err := collection.Find(ctx, bson.M{})
-	if err != nil {
-		fmt.Println("error at collection find",err)
-		return persons,err
+	result, err := collection.InsertOne(ctx, user)
+	if err!=nil{
+		return result,err
 	}
-	defer cursor.Close(ctx)
-	for cursor.Next(ctx) {
-		var p models.Person
-		cursor.Decode(&p)
-		persons = append(persons, p)
-	}
-	if err := cursor.Err(); err != nil {
-		return persons,err
+	return result,nil
+}
 
+//GetUserByID give the user by id
+func (m *mongoDBRepo) GetUserByID(id string) (models.User,error){
+	var u models.User
+	collection := m.DB.Database("gochat").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	userID ,err := primitive.ObjectIDFromHex(id)
+	if err!=nil{
+		return u,err
 	}
-	return persons,nil
+	fmt.Println(userID)
+	err = collection.FindOne(ctx, models.User{ID:userID}).Decode(&u)
+	if err!=nil{
+		return u,err
+	}
+	return u,nil
 }

@@ -6,5 +6,6 @@ import (
 
 //DatabaseRepo interface will hold all db functions
 type DatabaseRepo interface {
-	GetPeople() ([]models.Person, error)
+	RegisterUser(user models.User) (interface{}, error) 
+	GetUserByID(id string) (models.User,error)
 }
