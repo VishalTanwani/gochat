@@ -1,16 +1,17 @@
 package handler
 
 import (
-	"strings"
-	"time"
-	"fmt"
-	"net/http"
 	"encoding/json"
+	"fmt"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
-	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
+	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"github.com/VishalTanwani/gochat/apiserver/internal/repository"
 	"github.com/VishalTanwani/gochat/apiserver/internal/repository/dbrepo"
+	"net/http"
+	"math/rand"
+	"strings"
+	"time"
 )
 
 //Repository is repository type
@@ -30,7 +31,6 @@ func NewRepo(a *config.AppConfig, db *driver.DB) {
 	}
 }
 
-
 //RegisterUser will register the user in our data base
 func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
@@ -38,18 +38,24 @@ func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&user)
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	user.Name = strings.Split(user.Email,"@")[0]
-	fmt.Println(user)
-	if err!=nil{
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
-		return
-	}
-	userID,err := m.DB.RegisterUser(user)
+	user.ProfileImage = fmt.Sprintf("https://avatars.dicebear.com/api/avataaars/%d.svg",rand.Intn(1000))
+	user.Name = strings.Split(user.Email, "@")[0]
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
 		return
 	}
-	json.NewEncoder(w).Encode(userID)
+	userID, err := m.DB.RegisterUser(user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
+		return
+	}
+	u,err := m.DB.GetUserByID(userID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage":` + err.Error() + `}`))
+		return
+	}
+	json.NewEncoder(w).Encode(u)
 }

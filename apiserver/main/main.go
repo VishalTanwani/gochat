@@ -1,19 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/VishalTanwani/gochat/apiserver/internal/config"
+	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
+	"github.com/VishalTanwani/gochat/apiserver/internal/handler"
 	"log"
 	"net/http"
-	"context"
-	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
-	"github.com/VishalTanwani/gochat/apiserver/internal/config"
-	"github.com/VishalTanwani/gochat/apiserver/internal/handler"
 )
 
 const port = ":4000"
+
 var app config.AppConfig
 
-func main(){
+func main() {
 	fmt.Println("api server")
 	fmt.Println("server is running at", port)
 	db, err := run()
@@ -21,13 +22,12 @@ func main(){
 		log.Println("error at run in main", err)
 		return
 	}
-	
+
 	defer func() {
 		if err := db.Mongo.Disconnect(context.TODO()); err != nil {
 			panic(err)
 		}
 	}()
-
 
 	server := &http.Server{
 		Addr:    port,
@@ -40,18 +40,18 @@ func main(){
 	}
 }
 
-func run() (*driver.DB, error)  {
+func run() (*driver.DB, error) {
 	//connect to database
 	fmt.Println("Connecting to database...")
 	name := "vishal"
-	pass:="0109"
-	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@gochat.gcc8h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", name,pass)
+	pass := "0109"
+	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@gochat.gcc8h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", name, pass)
 	db, err := driver.ConnectMongo(connectionString)
 	if err != nil {
 		log.Fatal("cannot connect to database ", err)
-		return nil,err
+		return nil, err
 	}
 	handler.NewRepo(&app, db)
-	return db,nil
+	return db, nil
 
 }

@@ -1,9 +1,9 @@
 package dbrepo
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
 	"github.com/VishalTanwani/gochat/apiserver/internal/repository"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type mongoDBRepo struct {
