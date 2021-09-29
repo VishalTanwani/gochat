@@ -11,6 +11,7 @@ type User struct {
 	Email        string             `json:"email,omitempty" bson:"email,omitempty"`
 	Name         string             `json:"name,omitempty" bson:"name,omitempty"`
 	ProfileImage string             `json:"profile_image,omitempty" bson:"profile_image,omitempty"`
+	Token        string             `json:"token,omitempty" bson:"token,omitempty"`
 	CreatedAt    time.Time          `json:"create_at,omitempty" bson:"create_at,omitempty"`
 	UpdatedAt    time.Time          `json:"update_at,omitempty" bson:"update_at,omitempty"`
 }

@@ -8,4 +8,5 @@ import (
 type DatabaseRepo interface {
 	RegisterUser(user models.User) (string, error)
 	GetUserByID(id string) (models.User, error)
+	GetUserByEmail(email string) (models.User, error)
 }
