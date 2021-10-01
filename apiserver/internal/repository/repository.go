@@ -9,4 +9,6 @@ type DatabaseRepo interface {
 	RegisterUser(user models.User) (string, error)
 	GetUserByID(id string) (models.User, error)
 	GetUserByEmail(email string) (models.User, error)
+	CheckUserAvaiability(email string) error
+	UpdateUser(u models.User) (string, error)
 }

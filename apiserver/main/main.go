@@ -8,6 +8,7 @@ import (
 	"github.com/VishalTanwani/gochat/apiserver/internal/handler"
 	"log"
 	"net/http"
+	"os"
 )
 
 const port = ":4000"
@@ -41,6 +42,13 @@ func main() {
 }
 
 func run() (*driver.DB, error) {
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	//connect to database
 	fmt.Println("Connecting to database...")
 	name := "vishal"
