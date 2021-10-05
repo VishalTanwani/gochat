@@ -9,6 +9,8 @@ import (
 func routes() http.Handler {
 	mux := chi.NewRouter()
 	mux.Post("/register", handler.Repo.RegisterUser)
+	mux.Post("/room/create", handler.Repo.CreateRoom)
+	mux.Post("/room/join", handler.Repo.JoinRoom)
 	return mux
 
 }

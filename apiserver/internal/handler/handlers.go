@@ -50,6 +50,7 @@ func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		user.CreatedAt = time.Now().Unix()
 		user.UpdatedAt = time.Now().Unix()
+		user.Status = "online"
 		user.LastLogin = append(user.LastLogin, time.Now().Unix())
 		rand.Seed(time.Now().UnixNano())
 		user.ProfileImage = fmt.Sprintf("https://avatars.dicebear.com/api/avataaars/%v.svg", rand.Intn(1000))
@@ -76,33 +77,122 @@ func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	} else {
 		u.LastLogin = append(u.LastLogin, time.Now().Unix())
 		u.UpdatedAt = time.Now().Unix()
-		result, err := m.DB.UpdateUser(u)
+		_, err := m.DB.UpdateUser(u)
 		if err != nil {
 			m.App.ErrorLog.Println("error at registering user")
 			helpers.ServerError(w, err)
 			return
 		}
-		if result == "" {
-			u, err := m.DB.GetUserByID(primtiveObjToString(u))
-			if err != nil {
-				m.App.ErrorLog.Println("error at geting user")
-				helpers.ServerError(w, err)
-				return
-			}
-			u.Token, err = generateJWTToken(u)
-			if err != nil {
-				m.App.ErrorLog.Println("error at generating token")
-				helpers.ServerError(w, err)
-				return
-			}
+		u, err := m.DB.GetUserByID(primtiveObjToString(u.ID))
+		if err != nil {
+			m.App.ErrorLog.Println("error at geting user")
+			helpers.ServerError(w, err)
+			return
+		}
+		u.Token, err = generateJWTToken(u)
+		if err != nil {
+			m.App.ErrorLog.Println("error at generating token")
+			helpers.ServerError(w, err)
+			return
 		}
 		json.NewEncoder(w).Encode(u)
 	}
 }
 
+//CreateRoom will creat a room in our data base
+func (m *Repository) CreateRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	err = m.DB.CheckRoomAvaiability(temp.Name)
+	if err != nil {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decoding token")
+			helpers.ServerError(w, err)
+			return
+		}
+		var room models.Room
+		room.Name = temp.Name
+		room.CreatedAt = time.Now().Unix()
+		room.UpdatedAt = time.Now().Unix()
+		room.Description = "Description ..."
+		room.CreatedBy = fmt.Sprint(mapData["email"])
+		room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
+
+		roomID, err := m.DB.CreateRoom(room)
+		if err != nil {
+			m.App.ErrorLog.Println("error at creating room")
+			helpers.ServerError(w, err)
+			return
+		}
+
+		room, err = m.DB.GetRoomByID(roomID)
+		if err != nil {
+			m.App.ErrorLog.Println("error at getting room")
+			helpers.ServerError(w, err)
+			return
+		}
+		json.NewEncoder(w).Encode(room)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "room is already created" }`))
+		return
+	}
+}
+
+//JoinRoom will join a user to room
+func (m *Repository) JoinRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	room, err := m.DB.GetRoomByName(temp.Name)
+	if err == nil {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decoding token")
+			helpers.ServerError(w, err)
+			return
+		}
+		room.UpdatedAt = time.Now().Unix()
+		room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
+
+		_, err = m.DB.UpdateRoom(room)
+		if err != nil {
+			m.App.ErrorLog.Println("error at updateing room")
+			helpers.ServerError(w, err)
+			return
+		}
+
+		room, err = m.DB.GetRoomByID(primtiveObjToString(room.ID))
+		if err != nil {
+			m.App.ErrorLog.Println("error at getting room")
+			helpers.ServerError(w, err)
+			return
+		}
+		json.NewEncoder(w).Encode(room)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "cannot find room" }`))
+		return
+	}
+
+}
+
 func generateJWTToken(user models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claim := token.Claims.(jwt.MapClaims)
+	claim["_id"] = user.ID
 	claim["name"] = user.Name
 	claim["email"] = user.Email
 	claim["exp"] = time.Now().Add(time.Hour * 24 * 30).Unix()
@@ -147,7 +237,7 @@ func tokenDecode(tokenString string) (jwt.MapClaims, error) {
 	return nil, err
 }
 
-func primtiveObjToString(u models.User) string {
-	ID := fmt.Sprintf("%s", u.ID)
+func primtiveObjToString(id interface{}) string {
+	ID := fmt.Sprintf("%s", id)
 	return strings.Split(ID, "\"")[1]
 }

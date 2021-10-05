@@ -19,8 +19,7 @@ func (m *mongoDBRepo) RegisterUser(user models.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ID := fmt.Sprintf("%s", result.InsertedID)
-	return strings.Split(ID, "\"")[1], nil
+	return primtiveObjToString(result.InsertedID), nil
 }
 
 //GetUserByID give the user by id
@@ -77,9 +76,84 @@ func (m *mongoDBRepo) UpdateUser(u models.User) (string, error) {
 		return "", nil
 	}
 	if result.UpsertedCount != 0 {
-		ID := fmt.Sprintf("%s", result.UpsertedID)
-		return strings.Split(ID, "\"")[1], nil
+		return primtiveObjToString(result.UpsertedID), nil
 	}
 
 	return "", nil
+}
+
+//CreateRoom will create a room in db
+func (m *mongoDBRepo) CreateRoom(room models.Room) (string, error) {
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	result, err := collection.InsertOne(ctx, room)
+	if err != nil {
+		return "", err
+	}
+	return primtiveObjToString(result.InsertedID), nil
+}
+
+//GetRoomByID give the user by id
+func (m *mongoDBRepo) GetRoomByID(id string) (models.Room, error) {
+	var room models.Room
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	roomID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return room, err
+	}
+	err = collection.FindOne(ctx, models.Room{ID: roomID}).Decode(&room)
+	if err != nil {
+		return room, err
+	}
+	return room, nil
+}
+
+//GetRoomByName give the user by name
+func (m *mongoDBRepo) GetRoomByName(name string) (models.Room, error) {
+	var room models.Room
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := collection.FindOne(ctx, models.Room{Name: name}).Decode(&room)
+	if err != nil {
+		return room, err
+	}
+	return room, nil
+}
+
+//CheckRoomAvaiability give the user by id
+func (m *mongoDBRepo) CheckRoomAvaiability(name string) error {
+	var room models.Room
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := collection.FindOne(ctx, models.Room{Name: name}).Decode(&room)
+	return err
+}
+
+//UpdateRoom will update room
+func (m *mongoDBRepo) UpdateRoom(room models.Room) (string, error) {
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	result, err := collection.ReplaceOne(ctx, models.Room{ID: room.ID}, room)
+	if err != nil {
+		return "", err
+	}
+
+	if result.MatchedCount != 0 {
+		return "", nil
+	}
+	if result.UpsertedCount != 0 {
+		return primtiveObjToString(result.UpsertedID), nil
+	}
+	return "", nil
+}
+
+func primtiveObjToString(id interface{}) string {
+	ID := fmt.Sprintf("%s", id)
+	return strings.Split(ID, "\"")[1]
 }
