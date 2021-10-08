@@ -3,11 +3,11 @@ package dbrepo
 import (
 	"context"
 	"fmt"
+	"github.com/VishalTanwani/gochat/apiserver/internal/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"strings"
 	"time"
-	// "go.mongodb.org/mongo-driver/bson"
-	"github.com/VishalTanwani/gochat/apiserver/internal/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //RegisterUser will register a user
@@ -42,7 +42,7 @@ func (m *mongoDBRepo) GetUserByID(id string) (models.User, error) {
 //GetUserByEmail give the user by email
 func (m *mongoDBRepo) GetUserByEmail(email string) (models.User, error) {
 	var u models.User
-	collection := m.DB.Database("gochat").Collection("users")
+	collection := m.DB.Database("gochat").Collection("user")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err := collection.FindOne(ctx, models.User{Email: email}).Decode(&u)
@@ -50,6 +50,30 @@ func (m *mongoDBRepo) GetUserByEmail(email string) (models.User, error) {
 		return u, err
 	}
 	return u, nil
+}
+
+//GetUserRooms give the user rooms by email
+func (m *mongoDBRepo) GetUserRooms(email string) ([]models.Room, error) {
+	var rooms []models.Room
+	collection := m.DB.Database("gochat").Collection("rooms")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	// var emails []string
+	// emails = append(emails,email)
+	cursor, err := collection.Find(ctx, bson.D{{"users", email}})
+	if err != nil {
+		return rooms, err
+	}
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var room models.Room
+		cursor.Decode(&room)
+		rooms = append(rooms, room)
+	}
+	if err := cursor.Err(); err != nil {
+		return rooms, err
+	}
+	return rooms, nil
 }
 
 //CheckUserAvaiability give the user by id

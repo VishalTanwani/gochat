@@ -16,4 +16,5 @@ type DatabaseRepo interface {
 	GetRoomByName(name string) (models.Room, error)
 	CheckRoomAvaiability(name string) error
 	UpdateRoom(room models.Room) (string, error)
+	GetUserRooms(email string) ([]models.Room, error)
 }

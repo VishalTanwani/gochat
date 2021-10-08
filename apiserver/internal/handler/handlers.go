@@ -51,6 +51,7 @@ func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		user.CreatedAt = time.Now().Unix()
 		user.UpdatedAt = time.Now().Unix()
 		user.Status = "online"
+		user.About = "Hey there i am using gochat which is rip off of whatsapp"
 		user.LastLogin = append(user.LastLogin, time.Now().Unix())
 		rand.Seed(time.Now().UnixNano())
 		user.ProfileImage = fmt.Sprintf("https://avatars.dicebear.com/api/avataaars/%v.svg", rand.Intn(1000))
@@ -109,39 +110,51 @@ func (m *Repository) CreateRoom(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
-	err = m.DB.CheckRoomAvaiability(temp.Name)
+	check, err := verifyToken(temp.Token)
 	if err != nil {
-		mapData, err := tokenDecode(temp.Token)
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		err = m.DB.CheckRoomAvaiability(temp.Name)
 		if err != nil {
-			m.App.ErrorLog.Println("error at decoding token")
-			helpers.ServerError(w, err)
-			return
-		}
-		var room models.Room
-		room.Name = temp.Name
-		room.CreatedAt = time.Now().Unix()
-		room.UpdatedAt = time.Now().Unix()
-		room.Description = "Description ..."
-		room.CreatedBy = fmt.Sprint(mapData["email"])
-		room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
+			mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+			var room models.Room
+			room.Name = temp.Name
+			room.CreatedAt = time.Now().Unix()
+			room.UpdatedAt = time.Now().Unix()
+			room.Description = "Description ..."
+			room.CreatedBy = fmt.Sprint(mapData["email"])
+			room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
 
-		roomID, err := m.DB.CreateRoom(room)
-		if err != nil {
-			m.App.ErrorLog.Println("error at creating room")
-			helpers.ServerError(w, err)
-			return
-		}
+			roomID, err := m.DB.CreateRoom(room)
+			if err != nil {
+				m.App.ErrorLog.Println("error at creating room")
+				helpers.ServerError(w, err)
+				return
+			}
 
-		room, err = m.DB.GetRoomByID(roomID)
-		if err != nil {
-			m.App.ErrorLog.Println("error at getting room")
-			helpers.ServerError(w, err)
+			room, err = m.DB.GetRoomByID(roomID)
+			if err != nil {
+				m.App.ErrorLog.Println("error at getting room")
+				helpers.ServerError(w, err)
+				return
+			}
+			json.NewEncoder(w).Encode(room)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "room is already created" }`))
 			return
 		}
-		json.NewEncoder(w).Encode(room)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"meesage": "room is already created" }`))
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
 		return
 	}
 }
@@ -156,37 +169,325 @@ func (m *Repository) JoinRoom(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
-	room, err := m.DB.GetRoomByName(temp.Name)
-	if err == nil {
-		mapData, err := tokenDecode(temp.Token)
-		if err != nil {
-			m.App.ErrorLog.Println("error at decoding token")
-			helpers.ServerError(w, err)
-			return
-		}
-		room.UpdatedAt = time.Now().Unix()
-		room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
+		if err == nil {
+			mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+			room.UpdatedAt = time.Now().Unix()
+			for _, v := range room.Users {
+				if v == fmt.Sprint(mapData["email"]) {
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte(`{"meesage": "already joined" }`))
+					return
+				}
+			}
+			room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
 
-		_, err = m.DB.UpdateRoom(room)
-		if err != nil {
-			m.App.ErrorLog.Println("error at updateing room")
-			helpers.ServerError(w, err)
-			return
-		}
+			_, err = m.DB.UpdateRoom(room)
+			if err != nil {
+				m.App.ErrorLog.Println("error at updateing room")
+				helpers.ServerError(w, err)
+				return
+			}
 
-		room, err = m.DB.GetRoomByID(primtiveObjToString(room.ID))
-		if err != nil {
-			m.App.ErrorLog.Println("error at getting room")
-			helpers.ServerError(w, err)
+			room, err = m.DB.GetRoomByID(primtiveObjToString(room.ID))
+			if err != nil {
+				m.App.ErrorLog.Println("error at getting room")
+				helpers.ServerError(w, err)
+				return
+			}
+			json.NewEncoder(w).Encode(room)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
 			return
 		}
-		json.NewEncoder(w).Encode(room)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"meesage": "cannot find room" }`))
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
 		return
 	}
 
+}
+
+//LeaveRoom will join a user to room
+func (m *Repository) LeaveRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
+		if err == nil {
+			mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+			room.UpdatedAt = time.Now().Unix()
+			for i, v := range room.Users {
+				if v == fmt.Sprint(mapData["email"]) {
+					room.Users = append(room.Users[:i], room.Users[i+1:]...)
+					_, err = m.DB.UpdateRoom(room)
+					if err != nil {
+						m.App.ErrorLog.Println("error at updateing room")
+						helpers.ServerError(w, err)
+						return
+					}
+
+					room, err = m.DB.GetRoomByID(primtiveObjToString(room.ID))
+					if err != nil {
+						m.App.ErrorLog.Println("error at getting room")
+						helpers.ServerError(w, err)
+						return
+					}
+					json.NewEncoder(w).Encode(room)
+					return
+				}
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "You are not in a room" }`))
+			return
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+
+}
+
+//UpdateRoom will join a update a room
+func (m *Repository) UpdateRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
+		if err == nil {
+			mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+			for _, v := range room.Users {
+				if v == fmt.Sprint(mapData["email"]) {
+					if room.Name != temp.Name {
+						room.Name = temp.Name
+					}
+					if room.Description != temp.Description {
+						room.Description = temp.Description
+					}
+					room.UpdatedAt = time.Now().Unix()
+
+					_, err = m.DB.UpdateRoom(room)
+					if err != nil {
+						m.App.ErrorLog.Println("error at updateing room")
+						helpers.ServerError(w, err)
+						return
+					}
+
+					room, err = m.DB.GetRoomByID(primtiveObjToString(room.ID))
+					if err != nil {
+						m.App.ErrorLog.Println("error at getting room")
+						helpers.ServerError(w, err)
+						return
+					}
+					json.NewEncoder(w).Encode(room)
+					return
+				}
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "you cannot update a room" }`))
+			return
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//UpdateUser will join a update a room
+func (m *Repository) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.User
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decodeing token")
+			helpers.ServerError(w, err)
+			return
+		}
+		user, err := m.DB.GetUserByID(fmt.Sprint(mapData["_id"]))
+		if err == nil {
+			if user.Name != temp.Name {
+				user.Name = temp.Name
+			}
+			if user.About != temp.About {
+				user.About = temp.About
+			}
+			user.UpdatedAt = time.Now().Unix()
+
+			_, err = m.DB.UpdateUser(user)
+			if err != nil {
+				m.App.ErrorLog.Println("error at updateing room")
+				helpers.ServerError(w, err)
+				return
+			}
+
+			user, err = m.DB.GetUserByID(primtiveObjToString(user.ID))
+			if err != nil {
+				m.App.ErrorLog.Println("error at getting user")
+				helpers.ServerError(w, err)
+				return
+			}
+			json.NewEncoder(w).Encode(user)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find user" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//GetUserProfile will join a update a room
+func (m *Repository) GetUserProfile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.User
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decodeing token")
+			helpers.ServerError(w, err)
+			return
+		}
+		user, err := m.DB.GetUserByID(fmt.Sprint(mapData["_id"]))
+		fmt.Println(user)
+		if err == nil {
+			json.NewEncoder(w).Encode(user)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find user" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//UserRooms will join a update a room
+func (m *Repository) UserRooms(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.User
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decodeing token")
+			helpers.ServerError(w, err)
+			return
+		}
+		rooms, err := m.DB.GetUserRooms(fmt.Sprint(mapData["email"]))
+		if err == nil {
+			json.NewEncoder(w).Encode(rooms)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find user" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
 }
 
 func generateJWTToken(user models.User) (string, error) {
