@@ -39,6 +39,7 @@ func NewRepo(a *config.AppConfig, db *driver.DB) {
 //RegisterUser will register the user in our data base
 func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
