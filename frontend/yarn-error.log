@@ -1,0 +1,78 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn start
+
+PATH: 
+  /Users/vishal/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Applications/Postgres.app/Contents/Versions/latest/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  12.14.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: write EIO
+      at afterWriteDispatched (internal/stream_base_commons.js:149:25)
+      at writeGeneric (internal/stream_base_commons.js:140:3)
+      at WriteStream.Socket._writeGeneric (net.js:776:11)
+      at WriteStream.Socket._write (net.js:788:8)
+      at doWrite (_stream_writable.js:435:12)
+      at writeOrBuffer (_stream_writable.js:419:5)
+      at WriteStream.Writable.write (_stream_writable.js:309:11)
+      at Object.clearLine (readline.js:1268:17)
+      at clearLine (/usr/local/lib/node_modules/yarn/lib/cli.js:49657:12)
+      at ConsoleReporter._log (/usr/local/lib/node_modules/yarn/lib/cli.js:96768:43)
+
+npm manifest: 
+  {
+    "name": "booksle-react",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+      "@material-ui/core": "^4.9.14",
+      "@material-ui/icons": "^4.9.1",
+      "@testing-library/jest-dom": "^4.2.4",
+      "@testing-library/react": "^9.5.0",
+      "@testing-library/user-event": "^7.2.1",
+      "axios": "^0.22.0",
+      "graphql-fetch": "^1.0.1",
+      "nanoid": "^3.1.23",
+      "react": "^16.13.1",
+      "react-dom": "^16.13.1",
+      "react-redux": "5.0.7",
+      "react-router-dom": "^5.2.0",
+      "react-scripts": "3.4.1",
+      "redux": "4.0.0",
+      "redux-thunk": "^2.3.0"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+      "extends": "react-app"
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

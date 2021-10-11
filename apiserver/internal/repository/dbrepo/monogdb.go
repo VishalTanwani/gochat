@@ -42,7 +42,7 @@ func (m *mongoDBRepo) GetUserByID(id string) (models.User, error) {
 //GetUserByEmail give the user by email
 func (m *mongoDBRepo) GetUserByEmail(email string) (models.User, error) {
 	var u models.User
-	collection := m.DB.Database("gochat").Collection("user")
+	collection := m.DB.Database("gochat").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err := collection.FindOne(ctx, models.User{Email: email}).Decode(&u)

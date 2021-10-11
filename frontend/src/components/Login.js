@@ -1,10 +1,19 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import "./login.css"
 import { Button } from '@material-ui/core'
 import { StateContext } from "../context/StateProvider"
 
-function Login() {
+function Login(props) {
+    useEffect(() => {
+        if (window && window.localStorage["token"]) {
+            props.history.push("/whatsapp")
+        }
+    }, [props])
     const { unifiedRegister } = useContext(StateContext)
+    const handleClick = async () => {
+        await unifiedRegister("vishal@gmail.com")
+        await props.history.push("/whatsapp")
+    }
     return (
         <div className="login">
             <div className="login-container">
@@ -12,7 +21,7 @@ function Login() {
                 <div className="login-text">
                     <h1>Sign in to WhatsApp</h1>
                 </div>
-                <Button onClick={() => unifiedRegister("vishal2@gmail.com")}>
+                <Button onClick={handleClick}>
                     Sign In With Email
                 </Button>
             </div>

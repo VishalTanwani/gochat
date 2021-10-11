@@ -1,17 +1,26 @@
 import "./sidebar.css";
-import React from "react";
+import React,{ useContext, useEffect } from "react";
 import { Avatar, IconButton } from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import SearchOutlinedIcon from "@material-ui/icons/SearchOutlined";
 import Conversation from "./Conversation"
+import { StateContext } from "../context/StateProvider"
 
 function SideBar() {
+  const { getProfile, user } = useContext(StateContext)
+  useEffect(() => {
+    async function fetchData() {
+      !user && await getProfile(window.localStorage['token'])
+    }
+    fetchData()
+  }, [getProfile,user])
+  console.log(user)
   return (
     <div className="sidebar">
       <header className="header">
-        <Avatar />
+        <Avatar src={user && user.profile_image}/>
         <div className="otherIcons">
           <IconButton>
             <DonutLargeIcon />

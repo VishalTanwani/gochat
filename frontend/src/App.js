@@ -1,19 +1,12 @@
-import React,{useContext} from "react";
+import React from "react";
 import "./App.css";
-import SideBar from "./components/SideBar"
-import Chat from "./components/Chat";
-import Login from "./components/Login";
-import { StateContext } from "./context/StateProvider"
+import Routes from "./Routes"
 
 function App() {
-  const { state } = useContext(StateContext)
-console.log(state)
   return (
     <div className="App">
       <div className="app-container">
-        <Login/>
-        {state.user && <SideBar />}
-        {state.user && <Chat/>}
+        <Routes/>
       </div>
     </div>
   );
