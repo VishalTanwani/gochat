@@ -1,8 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import Login from "./components/Login"
-import SideBar from "./components/SideBar"
-import Chat from "./components/Chat"
+import Container from "./components/Container"
 import LandingPage from "./components/LandingPage";
 
 export default () => {
@@ -11,8 +10,7 @@ export default () => {
             <Switch>
                 <Route path="/" exact component={LandingPage}/>
                 <Route path="/login" exact component={Login}/>
-                <Route path="/whatsapp" exact component={SideBar}/>
-                <Route path="/whatsapp" exact component={Chat}/>
+                <Route path="/whatsapp" exact component={Container}/>
             </Switch>
         </>
     )

@@ -1,5 +1,5 @@
 import "./sidebar.css";
-import React,{ useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Avatar, IconButton } from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
@@ -9,14 +9,21 @@ import Conversation from "./Conversation"
 import { StateContext } from "../context/StateProvider"
 
 function SideBar() {
-  const { getProfile, user } = useContext(StateContext)
+  const { getProfile, user, userRooms, getRooms } = useContext(StateContext)
+  const [search, setSearch] = useState("")
+
   useEffect(() => {
     async function fetchData() {
       !user && await getProfile(window.localStorage['token'])
+      !user && await getRooms(window.localStorage['token'])
     }
     fetchData()
-  }, [getProfile,user])
-  console.log(user)
+  }, [])
+
+  const onSubmit = () => {
+    console.log("object")
+  }
+
   return (
     <div className="sidebar">
       <header className="header">
@@ -36,16 +43,25 @@ function SideBar() {
       <div className="search">
         <div className="search-container">
           <SearchOutlinedIcon style={{fill:"gray", padding:"10px"}} />
-          <input type="text" placeholder="Search or start new chat" />
+          <form onSubmit={onSubmit}>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+              placeholder="Search or start new chat"
+            />
+          <button onClick={onSubmit} type="submit">
+            send a message
+          </button>
+        </form>
         </div>
       </div>
       <div className="conversations">
-          <Conversation/>
-          <Conversation/>
-          <Conversation/>
-          <Conversation/>
-          <Conversation/>
-          <Conversation/>
+          {userRooms && userRooms.map((x,i) => (
+            <Conversation key={i} data={x}/>
+          ))}
       </div>
     </div>
   );

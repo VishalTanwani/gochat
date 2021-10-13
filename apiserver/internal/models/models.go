@@ -42,6 +42,7 @@ type RoomWithToken struct {
 	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
 	Token       string             `json:"token,omitempty" bson:"token,omitempty"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
+	GroupIcon string             `json:"group_icon,omitempty" bson:"group_icon,omitempty"`
 	Users       []string           `json:"users,omitempty" bson:"users,omitempty"`
 	CreatedBy   string             `json:"create_by,omitempty" bson:"create_by,omitempty"`
 	CreatedAt   int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`

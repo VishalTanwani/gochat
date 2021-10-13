@@ -130,6 +130,7 @@ func (m *Repository) CreateRoom(w http.ResponseWriter, r *http.Request) {
 			room.Name = temp.Name
 			room.CreatedAt = time.Now().Unix()
 			room.UpdatedAt = time.Now().Unix()
+			room.GroupIcon = fmt.Sprintf("https://avatars.dicebear.com/api/avataaars/%s.svg", temp.Name)
 			room.Description = "Description ..."
 			room.CreatedBy = fmt.Sprint(mapData["email"])
 			room.Users = append(room.Users, fmt.Sprint(mapData["email"]))
@@ -222,7 +223,7 @@ func (m *Repository) JoinRoom(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//LeaveRoom will join a user to room
+//LeaveRoom will leave a user to room
 func (m *Repository) LeaveRoom(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var temp models.RoomWithToken
@@ -351,7 +352,7 @@ func (m *Repository) UpdateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//UpdateUser will join a update a room
+//UpdateUser will join a update a user
 func (m *Repository) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var temp models.User
@@ -410,7 +411,7 @@ func (m *Repository) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//GetUserProfile will join a update a room
+//GetUserProfile will give user profile
 func (m *Repository) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var temp models.User
@@ -436,7 +437,6 @@ func (m *Repository) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, err := m.DB.GetUserByID(fmt.Sprint(mapData["_id"]))
-		fmt.Println(user)
 		if err == nil {
 			json.NewEncoder(w).Encode(user)
 		} else {
@@ -451,7 +451,7 @@ func (m *Repository) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//UserRooms will join a update a room
+//UserRooms will give users room
 func (m *Repository) UserRooms(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var temp models.User

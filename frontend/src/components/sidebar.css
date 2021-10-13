@@ -30,7 +30,14 @@
     height: 35px;
     border-radius: 20px;
 }
-.search-container > input {
+.search-container > form{
+    flex: 1;
+    display: flex;
+}
+.search-container > form > button{
+    display: none;
+}
+.search-container > form > input {
     border: none;
     margin-right: 10px;
     outline: none;

@@ -9,7 +9,7 @@ function LandingPage() {
         window.location.href = "/whatsapp";
     }
   }, []);
-  return <div>kabfljh</div>;
+  return <div></div>;
 }
 
 export default LandingPage;
