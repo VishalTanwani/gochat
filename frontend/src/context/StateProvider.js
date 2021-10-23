@@ -9,16 +9,17 @@ export const StateProvider = ({ children }) => {
   const value = {
     user: state.user,
     userRooms: state.userRooms,
-    alertStatus: state.alertStatus, 
-    alertMessage: state.alertMessage, 
+    alertStatus: state.alertStatus,
+    alertMessage: state.alertMessage,
+    profileStatue: state.profileStatue,
     unifiedRegister: async (email) => {
       axios
-        .post(window.global.api_location + "/user/register", {
+        .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
           "Content-Type": "application/json",
           email: email,
         })
         .then(function (response) {
-          window.localStorage["token"] = response.data.token
+          window.localStorage["token"] = response.data.token;
           dispatch({
             type: actionTypes.REGISTER_LOGIN,
             payload: response.data,
@@ -29,13 +30,13 @@ export const StateProvider = ({ children }) => {
           dispatch({
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
-            message: "Network error"
+            message: "Network error",
           });
         });
     },
     getProfile: async (token) => {
       axios
-        .post(window.global.api_location + "/user/profile", {
+        .post(process.env.REACT_APP_API_ENDPOINT + "/user/profile", {
           "Content-Type": "application/json",
           token: token,
         })
@@ -50,13 +51,13 @@ export const StateProvider = ({ children }) => {
           dispatch({
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
-            message: "Network error"
+            message: "Network error",
           });
         });
     },
     getRooms: async (token) => {
       axios
-        .post(window.global.api_location + "/user/rooms", {
+        .post(process.env.REACT_APP_API_ENDPOINT + "/user/rooms", {
           "Content-Type": "application/json",
           token: token,
         })
@@ -71,7 +72,7 @@ export const StateProvider = ({ children }) => {
           dispatch({
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
-            message: "Network error"
+            message: "Network error",
           });
         });
     },
@@ -79,9 +80,16 @@ export const StateProvider = ({ children }) => {
       dispatch({
         type: actionTypes.TRANSACTION_ERROR,
         status: status,
-        message: message
+        message: message,
       });
-    }
+    },
+    openProfile: (status) => {
+      console.log(status)
+      dispatch({
+        type: actionTypes.PROFILE_OPNER,
+        status: status,
+      });
+    },
   };
   return (
     <StateContext.Provider value={value}>{children}</StateContext.Provider>

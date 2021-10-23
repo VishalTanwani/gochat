@@ -5,63 +5,75 @@ import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import SearchOutlinedIcon from "@material-ui/icons/SearchOutlined";
-import Conversation from "./Conversation"
-import { StateContext } from "../context/StateProvider"
+import Conversation from "./Conversation";
+import { StateContext } from "../context/StateProvider";
 
 function SideBar() {
-  const { getProfile, user, userRooms, getRooms } = useContext(StateContext)
-  const [search, setSearch] = useState("")
+  const {
+    getProfile,
+    user,
+    userRooms,
+    getRooms,
+    openProfile,
+    profileStatue,
+  } = useContext(StateContext);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function fetchData() {
-      !user && await getProfile(window.localStorage['token'])
-      !user && await getRooms(window.localStorage['token'])
+      !user && (await getProfile(window.localStorage["token"]));
+      !user && (await getRooms(window.localStorage["token"]));
     }
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const onSubmit = () => {
-    console.log("object")
-  }
+    console.log("object");
+  };
+
+  const profileClick = () => {
+    openProfile(true);
+  };
 
   return (
     <div className="sidebar">
       <header className="header">
-        <Avatar src={user && user.profile_image}/>
-        <div className="otherIcons">
-          <IconButton>
-            <DonutLargeIcon />
-          </IconButton>
-          <IconButton>
-            <ChatIcon />
-          </IconButton>
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        </div>
+        <>
+          <Avatar src={user && user.profile_image} onClick={profileClick} />
+          <div className="otherIcons">
+            <IconButton>
+              <DonutLargeIcon />
+            </IconButton>
+            <IconButton>
+              <ChatIcon />
+            </IconButton>
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </div>
+        </>
       </header>
       <div className="search">
         <div className="search-container">
-          <SearchOutlinedIcon style={{fill:"gray", padding:"10px"}} />
+          <SearchOutlinedIcon style={{ fill: "gray", padding: "10px" }} />
           <form onSubmit={onSubmit}>
             <input
               type="text"
               value={search}
               onChange={(e) => {
-                setSearch(e.target.value)
+                setSearch(e.target.value);
               }}
               placeholder="Search or start new chat"
             />
-          <button onClick={onSubmit} type="submit">
-            send a message
-          </button>
-        </form>
+            <button onClick={onSubmit} type="submit">
+              send a message
+            </button>
+          </form>
         </div>
       </div>
       <div className="conversations">
-          {userRooms && userRooms.map((x,i) => (
-            <Conversation key={i} data={x}/>
-          ))}
+        {userRooms &&
+          userRooms.map((x, i) => <Conversation key={i} data={x} />)}
       </div>
     </div>
   );

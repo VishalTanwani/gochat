@@ -3,6 +3,7 @@ export const initialState = {
     userRooms: null,
     alertStatus: null,
     alertMessage: null,
+    profileStatue: null,
 }
 
 export const actionTypes = {
@@ -10,6 +11,7 @@ export const actionTypes = {
     GET_PROFILE: "GET_PROFILE",
     GET_ROOMS: "GET_ROOMS",
     TRANSACTION_ERROR: "TRANSACTION_ERROR",
+    PROFILE_OPNER: "PROFILE_OPNER",
 }
 
 const reducer = (state, action) => {
@@ -34,6 +36,11 @@ const reducer = (state, action) => {
                 ...state,
                 alertStatus: action.status,
                 alertMessage: action.message
+            }
+        case "PROFILE_OPNER":
+            return {
+                ...state,
+                profileStatue: action.status
             }
         default:
             return state;
