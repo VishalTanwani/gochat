@@ -9,6 +9,7 @@ export const StateProvider = ({ children }) => {
   const value = {
     user: state.user,
     userRooms: state.userRooms,
+    currentRoom: state.currentRoom,
     alertStatus: state.alertStatus,
     alertMessage: state.alertMessage,
     profileStatue: state.profileStatue,
@@ -34,11 +35,11 @@ export const StateProvider = ({ children }) => {
           });
         });
     },
-    getProfile: async (token) => {
+    getProfile: async () => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/profile", {
           "Content-Type": "application/json",
-          token: token,
+          token: window.localStorage["token"],
         })
         .then(function (response) {
           dispatch({
@@ -55,15 +56,38 @@ export const StateProvider = ({ children }) => {
           });
         });
     },
-    getRooms: async (token) => {
+    getRooms: async () => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/rooms", {
           "Content-Type": "application/json",
-          token: token,
+          token: window.localStorage["token"],
         })
         .then(function (response) {
           dispatch({
             type: actionTypes.GET_ROOMS,
+            payload: response.data,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          dispatch({
+            type: actionTypes.TRANSACTION_ERROR,
+            status: true,
+            message: "Network error",
+          });
+        });
+    },
+    updateUser: async (name, about) => {
+      axios
+        .post(process.env.REACT_APP_API_ENDPOINT + "/user/update", {
+          "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          name: name,
+          about: about,
+        })
+        .then(function (response) {
+          dispatch({
+            type: actionTypes.UPDATE_USER,
             payload: response.data,
           });
         })
@@ -84,12 +108,33 @@ export const StateProvider = ({ children }) => {
       });
     },
     openProfile: (status) => {
-      console.log(status)
       dispatch({
         type: actionTypes.PROFILE_OPNER,
         status: status,
       });
     },
+    selectRoom: (_id) => {
+      axios
+        .post(process.env.REACT_APP_API_ENDPOINT + "/room/details", {
+          "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          _id: _id,
+        })
+        .then(function (response) {
+          dispatch({
+            type: actionTypes.SET_ROOM,
+            payload: response.data,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          dispatch({
+            type: actionTypes.TRANSACTION_ERROR,
+            status: true,
+            message: "Network error",
+          });
+        });
+    }
   };
   return (
     <StateContext.Provider value={value}>{children}</StateContext.Provider>

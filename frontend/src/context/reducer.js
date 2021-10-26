@@ -1,6 +1,7 @@
 export const initialState = {
     user: null,
     userRooms: null,
+    currentRoom: null,
     alertStatus: null,
     alertMessage: null,
     profileStatue: null,
@@ -8,10 +9,12 @@ export const initialState = {
 
 export const actionTypes = {
     REGISTER_LOGIN: "REGISTER_LOGIN",
+    UPDATE_USER: "UPDATE_USER",
     GET_PROFILE: "GET_PROFILE",
     GET_ROOMS: "GET_ROOMS",
     TRANSACTION_ERROR: "TRANSACTION_ERROR",
     PROFILE_OPNER: "PROFILE_OPNER",
+    SET_ROOM: "SET_ROOM",
 }
 
 const reducer = (state, action) => {
@@ -41,6 +44,16 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 profileStatue: action.status
+            }
+        case "UPDATE_USER":
+            return{
+                ...state,
+                user: action.payload
+            }
+        case "SET_ROOM":
+            return{
+                ...state,
+                currentRoom: action.payload
             }
         default:
             return state;

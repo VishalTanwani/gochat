@@ -377,12 +377,8 @@ func (m *Repository) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		}
 		user, err := m.DB.GetUserByID(fmt.Sprint(mapData["_id"]))
 		if err == nil {
-			if user.Name != temp.Name {
-				user.Name = temp.Name
-			}
-			if user.About != temp.About {
-				user.About = temp.About
-			}
+			user.Name = temp.Name
+			user.About = temp.About
 			user.UpdatedAt = time.Now().Unix()
 
 			_, err = m.DB.UpdateUser(user)
@@ -489,6 +485,39 @@ func (m *Repository) UserRooms(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"meesage": "token invalidation" }`))
 		return
 	}
+}
+
+//RoomDetails will give room details
+func (m *Repository) RoomDetails(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
+		if err == nil {
+			json.NewEncoder(w).Encode(room)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+
 }
 
 func generateJWTToken(user models.User) (string, error) {

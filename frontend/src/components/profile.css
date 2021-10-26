@@ -7,6 +7,7 @@
     height: 100vh;
     border-right: 1px solid lightgray;
     background-color: #ededed;
+    z-index: 1;
 }
 .profile-header{
     padding: 55px 20px 10px 20px;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import SendIcon from "@material-ui/icons/Send";
 import { nanoid } from "nanoid";
 import "./chat.css";
@@ -9,14 +9,15 @@ import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined"
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import MicIcon from "@material-ui/icons/Mic";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import { StateContext } from "../context/StateProvider";
 
 const socket = new WebSocket("ws://localhost:5000/ws");
 const userName = nanoid(4);
 
 const Chat = () => {
+  const { currentRoom } = useContext(StateContext);
+
   const [message, setMessage] = useState("");
-  const [check, setCheck] = useState(true);
-  const [room, setRoom] = useState("");
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const Chat = () => {
           Body: message,
           UUID: userName,
           Type: "message",
-          Room: room,
+          Room: currentRoom._id,
         })
       );
       await setMessage("");
@@ -59,38 +60,12 @@ const Chat = () => {
       console.log("object");
     }
   };
-
-  const joinRoom = async () => {
-    await socket.send(
-      JSON.stringify({
-        Body: room,
-        UUID: userName,
-        Type: "joinRoom",
-        Room: room,
-      })
-    );
-    await setCheck(false);
-  };
-
-  const leavRoom = () => {
-    setCheck(true);
-    setChats([]);
-    setRoom("");
-    socket.send(
-      JSON.stringify({
-        Body: room,
-        UUID: userName,
-        Type: "leaveRoom",
-        Room: room,
-      })
-    );
-  };
   return (
     <div className="chat">
-      <header className="chatHeader">
-        <Avatar />
+      {currentRoom &&<header className="chatHeader">
+        <Avatar src={currentRoom.group_icon}/>
         <div className="chatHeaderData">
-          <h3>room name</h3>
+          <h3>{currentRoom.name}</h3>
           <p>last seen at ...</p>
         </div>
         <div className="chatHeaderRight">
@@ -100,11 +75,11 @@ const Chat = () => {
           <IconButton>
             <MoreVertIcon />
           </IconButton>
-          <IconButton onClick={leavRoom}>
+          <IconButton>
             <ExitToAppIcon />
           </IconButton>
         </div>
-      </header>
+      </header>}
       <div id="chats" className="chatBody">
         {chats.map((data, i) =>
           data.Type === "message" ? (
@@ -137,21 +112,21 @@ const Chat = () => {
       <footer className="chatFooter">
         <EmojiEmotionsOutlinedIcon />
         <AttachFileIcon />
-        <form onSubmit={check ? joinRoom : sendMessage}>
+        <form onSubmit={sendMessage}>
           <input
             type="text"
-            value={check ? room : message}
+            value={message}
             onChange={(e) => {
-              check ? setRoom(e.target.value) : setMessage(e.target.value);
+              setMessage(e.target.value);
             }}
-            placeholder={`${check ? "Join a room" : "Type a message"}`}
+            placeholder="Type a message"
           />
-          <button onClick={check ? joinRoom : sendMessage} type="submit">
+          <button onClick={sendMessage} type="submit">
             send a message
           </button>
         </form>
-        {room.length !== 0 || message.length !== 0 ? (
-          <IconButton onClick={check ? joinRoom : sendMessage}>
+        {message.length !== 0 ? (
+          <IconButton onClick={sendMessage}>
             <SendIcon />
           </IconButton>
         ) : (

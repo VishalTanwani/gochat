@@ -15,17 +15,16 @@ function SideBar() {
     userRooms,
     getRooms,
     openProfile,
-    profileStatue,
   } = useContext(StateContext);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function fetchData() {
-      !user && (await getProfile(window.localStorage["token"]));
-      !user && (await getRooms(window.localStorage["token"]));
+      !user && (await getProfile());
+      !user && (await getRooms());
     }
     fetchData();
-  }, []);
+  }, [getProfile, getRooms, user]);
 
   const onSubmit = () => {
     console.log("object");
