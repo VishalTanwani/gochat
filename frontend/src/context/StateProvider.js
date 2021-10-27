@@ -14,17 +14,20 @@ export const StateProvider = ({ children }) => {
     alertMessage: state.alertMessage,
     profileStatue: state.profileStatue,
     unifiedRegister: async (email) => {
+      console.log(email)
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
           "Content-Type": "application/json",
           email: email,
         })
         .then(function (response) {
+          console.log(response)
           window.localStorage["token"] = response.data.token;
           dispatch({
             type: actionTypes.REGISTER_LOGIN,
             payload: response.data,
           });
+          window.location.href = "/whatsapp"
         })
         .catch(function (error) {
           console.log(error);

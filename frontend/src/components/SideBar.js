@@ -20,11 +20,11 @@ function SideBar() {
 
   useEffect(() => {
     async function fetchData() {
-      !user && (await getProfile());
-      !user && (await getRooms());
+      window.localStorage["token"] && (await getProfile());
+      window.localStorage["token"] && (await getRooms());
     }
     fetchData();
-  }, [getProfile, getRooms, user]);
+  }, []);
 
   const onSubmit = () => {
     console.log("object");

@@ -1,18 +1,20 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import "./login.css"
-import { Button } from '@material-ui/core'
 import { StateContext } from "../context/StateProvider"
+import { IconButton } from "@material-ui/core";
+import ArrowForward from '@material-ui/icons/ArrowForward';
 
 function Login(props) {
+    const [email, setEmail] = useState("")
     useEffect(() => {
         if (window && window.localStorage["token"]) {
             props.history.push("/whatsapp")
         }
     }, [props])
     const { unifiedRegister } = useContext(StateContext)
-    const handleClick = async () => {
-        await unifiedRegister("vishal@gmail.com")
-        await props.history.push("/whatsapp")
+    const handleClick = () => {
+        console.log("object")
+        unifiedRegister(email)
     }
     return (
         <div className="login">
@@ -21,9 +23,13 @@ function Login(props) {
                 <div className="login-text">
                     <h1>Sign in to WhatsApp</h1>
                 </div>
-                <Button onClick={handleClick}>
-                    Sign In With Email
-                </Button>
+                <div className="login-form">
+
+                <input type="text" placeholder="Email" autoFocus value={email} onChange={(e) => setEmail(e.target.value)}/>
+                <IconButton onClick={handleClick}>
+                    <ArrowForward/>
+                </IconButton>
+                </div>
             </div>
         </div>
     )
