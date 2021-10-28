@@ -8,6 +8,7 @@ import (
 //Client struct
 type Client struct {
 	ID     string
+	Name string
 	Conn   *websocket.Conn
 	Server *Server
 	Rooms  map[*Room]bool
@@ -65,6 +66,7 @@ func (c *Client) joinRoom(msg Message) {
 	fmt.Println("at client join room 2", room)
 	c.Rooms[room] = true
 	c.ID = msg.UUID
+	c.Name = msg.Name
 	room.Register <- c
 }
 

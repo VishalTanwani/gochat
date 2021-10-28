@@ -38,12 +38,12 @@ func (room *Room) StartRoom() {
 		case client := <-room.Register:
 			room.Clients[client] = true
 			fmt.Println("size of room is ", len(room.Clients))
-			room.writeMessageForRoom(Message{Body: "New user joined ...", UUID: client.ID, Type: "1"})
+			room.writeMessageForRoom(Message{Body: "New user joined ...", UUID: client.ID, Name: client.Name, Type: "1"})
 		case client := <-room.UnRegister:
 			if ok := room.Clients[client]; ok {
 				delete(room.Clients, client)
 				fmt.Println("size of room is ", len(room.Clients))
-				room.writeMessageForRoom(Message{Body: "user disconnected ...", UUID: client.ID, Type: "0"})
+				room.writeMessageForRoom(Message{Body: "user disconnected ...", UUID: client.ID, Name: client.Name, Type: "0"})
 			}
 		case msg := <-room.Broadcast:
 			fmt.Println("sending message to all ")

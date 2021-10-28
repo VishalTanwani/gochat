@@ -12,18 +12,24 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { StateContext } from "../context/StateProvider";
 
 const socket = new WebSocket("ws://localhost:5000/ws");
-const userName = nanoid(4);
 
 const Chat = () => {
-  const { currentRoom } = useContext(StateContext);
+  const { currentRoom, user } = useContext(StateContext);
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
+    joinRoom()
+    return () => {
+      setChats([])
+      leavRoom()
+    }
+  }, [currentRoom])
+
+  useEffect(() => {
     var scrollDiv = document.getElementById("chats");
     scrollDiv.scrollTop = scrollDiv.scrollHeight;
-    window.history.pushState("", `/${userName}`);
     socket.onopen = () => {
       console.log("connecting...");
       console.log("connected");
@@ -50,9 +56,10 @@ const Chat = () => {
       await socket.send(
         JSON.stringify({
           Body: message,
-          UUID: userName,
+          UUID: user._id,
+          Name: user.name,
           Type: "message",
-          Room: currentRoom._id,
+          Room: currentRoom.name,
         })
       );
       await setMessage("");
@@ -60,6 +67,31 @@ const Chat = () => {
       console.log("object");
     }
   };
+
+  const joinRoom = async () => {
+    await socket.send(
+      JSON.stringify({
+        Body: currentRoom.name,
+        UUID: user._id,
+        Name: user.name,
+        Type: "joinRoom",
+        Room: currentRoom.name,
+      })
+    );
+  };
+
+  const leavRoom = () => {
+    socket.send(
+      JSON.stringify({
+        Body: currentRoom.name,
+        UUID: user._id,
+        Name: user.name,
+        Type: "leaveRoom",
+        Room: currentRoom.name,
+      })
+    );
+  };
+
   return (
     <div className="chat">
       {currentRoom &&<header className="chatHeader">
@@ -86,10 +118,10 @@ const Chat = () => {
             <div
               key={i}
               className={`chatMessage ${
-                data.UUID === userName && "chatReciver"
+                data.UUID === user._id && "chatReciver"
               }`}
             >
-              <p>{data.UUID}</p>
+              <p>{data.Name}</p>
               <p>{data.Body}</p>
               <span className="chatTimeStamp"></span>
             </div>
@@ -97,12 +129,12 @@ const Chat = () => {
             <p key={i} className={`chatJoinOrLeft`}>
               {data.Type === "1"
                 ? `${
-                    data.UUID === userName
+                    data.UUID === user._id
                       ? "you joined"
-                      : `${data.UUID} joined`
+                      : `${data.Name} joined`
                   }`
                 : `${
-                    data.UUID === userName ? "you left" : `${data.UUID} left`
+                    data.UUID === user._id ? "you left" : `${data.UUID} left`
                   }`}
               <span className="chatTimeStamp"></span>
             </p>
