@@ -28,8 +28,9 @@ type UserRegister struct {
 type Room struct {
 	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
+	Type        string             `json:"type,omitempty" bson:"type,omitempty"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
-	GroupIcon string             `json:"group_icon,omitempty" bson:"group_icon,omitempty"`
+	GroupIcon   string             `json:"group_icon,omitempty" bson:"group_icon,omitempty"`
 	Users       []string           `json:"users,omitempty" bson:"users,omitempty"`
 	CreatedBy   string             `json:"create_by,omitempty" bson:"create_by,omitempty"`
 	CreatedAt   int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
@@ -40,11 +41,35 @@ type Room struct {
 type RoomWithToken struct {
 	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
+	Type        string             `json:"type,omitempty" bson:"type,omitempty"`
 	Token       string             `json:"token,omitempty" bson:"token,omitempty"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
-	GroupIcon string             `json:"group_icon,omitempty" bson:"group_icon,omitempty"`
+	GroupIcon   string             `json:"group_icon,omitempty" bson:"group_icon,omitempty"`
 	Users       []string           `json:"users,omitempty" bson:"users,omitempty"`
 	CreatedBy   string             `json:"create_by,omitempty" bson:"create_by,omitempty"`
 	CreatedAt   int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
 	UpdatedAt   int64              `json:"update_at,omitempty" bson:"update_at,omitempty"`
+}
+
+//Message is message model
+type Message struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	UserID    primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	UserName  string             `json:"user_name" bson:"user_name"`
+	Body      string             `json:"body" bson:"body"`
+	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
+	Room      string             `json:"room" bson:"room"`
+	CreatedAt int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
+}
+
+//MessageWithToken is message model
+type MessageWithToken struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	UserID    primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Token     string             `json:"token,omitempty" bson:"token,omitempty"`
+	UserName  string             `json:"user_name,omitempty" bson:"user_name,omitempty"`
+	Body      string             `json:"body,omitempty" bson:"body,omitempty"`
+	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
+	Room      string             `json:"room,omitempty" bson:"room,omitempty"`
+	CreatedAt int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
 }

@@ -55,11 +55,12 @@ const Chat = () => {
       console.log(message);
       await socket.send(
         JSON.stringify({
-          Body: message,
-          UUID: user._id,
-          Name: user.name,
-          Type: "message",
-          Room: currentRoom.name,
+          body: message,
+          user_id: user._id,
+          user_name: user.name,
+          type: "message",
+          room: currentRoom.name,
+          token: window.localStorage["token"]
         })
       );
       await setMessage("");
@@ -68,14 +69,15 @@ const Chat = () => {
     }
   };
 
-  const joinRoom = async () => {
-    await socket.send(
+  const joinRoom = () => {
+    socket.send(
       JSON.stringify({
-        Body: currentRoom.name,
-        UUID: user._id,
-        Name: user.name,
-        Type: "joinRoom",
-        Room: currentRoom.name,
+        body: currentRoom.name,
+        user_id: user._id,
+        user_name: user.name,
+        type: "joinRoom",
+        room: currentRoom.name,
+        token: window.localStorage["token"]
       })
     );
   };
@@ -83,15 +85,19 @@ const Chat = () => {
   const leavRoom = () => {
     socket.send(
       JSON.stringify({
-        Body: currentRoom.name,
-        UUID: user._id,
-        Name: user.name,
-        Type: "leaveRoom",
-        Room: currentRoom.name,
+        body: currentRoom.name,
+        user_id: user._id,
+        user_name: user.name,
+        type: "leaveRoom",
+        room: currentRoom.name,
+        token: window.localStorage["token"]
       })
     );
   };
 
+  let d = new Date()
+  let hours = d.getHours()
+  let minutes = d.getMinutes()
   return (
     <div className="chat">
       {currentRoom &&<header className="chatHeader">
@@ -114,29 +120,28 @@ const Chat = () => {
       </header>}
       <div id="chats" className="chatBody">
         {chats.map((data, i) =>
-          data.Type === "message" ? (
+          data.type === "message" ? (
             <div
               key={i}
               className={`chatMessage ${
-                data.UUID === user._id && "chatReciver"
+                data.user_id === user._id && "chatSender"
               }`}
             >
-              <p>{data.Name}</p>
-              <p>{data.Body}</p>
-              <span className="chatTimeStamp"></span>
+              <p >{data.user_name}</p>
+              <p className="dataMessage">{data.body}</p>
+              <div className="chatTimeStamp">{hours+":"+minutes}</div>
             </div>
           ) : (
             <p key={i} className={`chatJoinOrLeft`}>
-              {data.Type === "1"
+              {data.type === "joinRoom"
                 ? `${
-                    data.UUID === user._id
+                    data.user_id === user._id
                       ? "you joined"
-                      : `${data.Name} joined`
+                      : `${data.user_name} joined`
                   }`
                 : `${
-                    data.UUID === user._id ? "you left" : `${data.UUID} left`
+                    data.user_id === user._id ? "you left" : `${data.user_name} left`
                   }`}
-              <span className="chatTimeStamp"></span>
             </p>
           )
         )}

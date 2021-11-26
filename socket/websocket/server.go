@@ -1,9 +1,5 @@
 package websocket
 
-import (
-	"fmt"
-)
-
 // Server is Struct
 type Server struct {
 	Register   chan *Client
@@ -26,7 +22,6 @@ func NewServer() *Server {
 
 func (server *Server) writeMessage(msg Message) {
 	for c := range server.Clients {
-		fmt.Println(c)
 		c.Write(msg)
 	}
 }
@@ -42,7 +37,6 @@ func (server *Server) Start() {
 				delete(server.Clients, client)
 			}
 		case msg := <-server.Broadcast:
-			fmt.Println("sending message to all ")
 			server.writeMessage(msg)
 		}
 	}
@@ -51,7 +45,6 @@ func (server *Server) Start() {
 //FindRoom will find room
 func (server *Server) FindRoom(name string) *Room {
 	var room *Room
-	fmt.Println(server.Rooms)
 	for rm := range server.Rooms {
 		if rm.Name == name {
 			room = rm

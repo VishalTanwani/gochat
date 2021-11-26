@@ -177,6 +177,17 @@ func (m *mongoDBRepo) UpdateRoom(room models.Room) (string, error) {
 	return "", nil
 }
 
+func (m *mongoDBRepo) SendMessage(message models.MessageWithToken) (string, error) {
+	collection := m.DB.Database("gochat").Collection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_, err := collection.InsertOne(ctx, message)
+	if err != nil {
+		return "", err
+	}
+	return "Message sent", nil
+}
+
 func primtiveObjToString(id interface{}) string {
 	ID := fmt.Sprintf("%s", id)
 	return strings.Split(ID, "\"")[1]

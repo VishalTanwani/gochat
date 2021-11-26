@@ -17,4 +17,5 @@ type DatabaseRepo interface {
 	CheckRoomAvaiability(name string) error
 	UpdateRoom(room models.Room) (string, error)
 	GetUserRooms(email string) ([]models.Room, error)
+	SendMessage(message models.MessageWithToken) (string, error)
 }

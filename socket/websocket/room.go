@@ -1,7 +1,10 @@
 package websocket
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 )
 
 //Room struct
@@ -26,7 +29,6 @@ func NewRoom(name string) *Room {
 
 func (room *Room) writeMessageForRoom(msg Message) {
 	for c := range room.Clients {
-		fmt.Println(c)
 		c.Write(msg)
 	}
 }
@@ -37,17 +39,33 @@ func (room *Room) StartRoom() {
 		select {
 		case client := <-room.Register:
 			room.Clients[client] = true
-			fmt.Println("size of room is ", len(room.Clients))
-			room.writeMessageForRoom(Message{Body: "New user joined ...", UUID: client.ID, Name: client.Name, Type: "1"})
 		case client := <-room.UnRegister:
 			if ok := room.Clients[client]; ok {
 				delete(room.Clients, client)
-				fmt.Println("size of room is ", len(room.Clients))
-				room.writeMessageForRoom(Message{Body: "user disconnected ...", UUID: client.ID, Name: client.Name, Type: "0"})
 			}
 		case msg := <-room.Broadcast:
-			fmt.Println("sending message to all ")
+			_, err := SendDataToDB(msg)
+			if err != nil {
+				panic(err)
+			}
 			room.writeMessageForRoom(msg)
 		}
 	}
+}
+
+//SendDataToDB will send data to mongo db
+func SendDataToDB(msg Message) (string, error) {
+	jsonReq, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	resp, err := http.Post("http://localhost:4000/message/send", "application/json; charset=utf-8", bytes.NewBuffer(jsonReq))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	// Convert response body to string
+	bodyString := string(bodyBytes)
+	return bodyString, nil
 }

@@ -128,6 +128,7 @@ func (m *Repository) CreateRoom(w http.ResponseWriter, r *http.Request) {
 			}
 			var room models.Room
 			room.Name = temp.Name
+			room.Type = temp.Type
 			room.CreatedAt = time.Now().Unix()
 			room.UpdatedAt = time.Now().Unix()
 			room.GroupIcon = fmt.Sprintf("https://avatars.dicebear.com/api/avataaars/%s.svg", temp.Name)
@@ -488,7 +489,7 @@ func (m *Repository) UserRooms(w http.ResponseWriter, r *http.Request) {
 }
 
 //RoomDetails will give room details
-func (m *Repository) RoomDetails(w http.ResponseWriter, r *http.Request){
+func (m *Repository) RoomDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var temp models.RoomWithToken
 	err := json.NewDecoder(r.Body).Decode(&temp)
@@ -518,6 +519,44 @@ func (m *Repository) RoomDetails(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+}
+
+//SendMessage will store message in DB
+func (m *Repository) SendMessage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.MessageWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		temp.Token = ""
+		temp.CreatedAt = time.Now().Unix()
+		res, err := m.DB.SendMessage(temp)
+		if err == nil {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"meesage": ` + res + `}`))
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot send room" }`))
+			return
+		}
+
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
 }
 
 func generateJWTToken(user models.User) (string, error) {

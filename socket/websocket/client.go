@@ -1,16 +1,16 @@
 package websocket
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 )
 
 //Client struct
 type Client struct {
 	ID     string
-	Name string
+	Name   string
 	Conn   *websocket.Conn
 	Server *Server
+	Token  string
 	Rooms  map[*Room]bool
 }
 
@@ -34,7 +34,7 @@ func (c *Client) Read() {
 		var msg Message
 		err := c.Conn.ReadJSON(&msg)
 		if err != nil {
-			fmt.Println("at client.go Read", err)
+			panic(err)
 			return
 		}
 
@@ -50,30 +50,29 @@ func (c *Client) Read() {
 }
 
 func (c *Client) sendMessage(msg Message) {
-	fmt.Println("message client switch 1", msg)
 	if room := c.Server.FindRoom(msg.Room); room != nil {
 		room.Broadcast <- msg
 	}
 }
 
 func (c *Client) joinRoom(msg Message) {
-	fmt.Println("message client switch 2", msg)
 	room := c.Server.FindRoom(msg.Body)
-	fmt.Println("at client join room 1", room)
 	if room == nil {
 		room = c.Server.CreateRoom(msg.Body)
 	}
-	fmt.Println("at client join room 2", room)
 	c.Rooms[room] = true
-	c.ID = msg.UUID
-	c.Name = msg.Name
+	c.ID = msg.UserID
+	c.Name = msg.UserName
+	c.Token = msg.Token
 	room.Register <- c
+	room.Broadcast <- msg
+
 }
 
 func (c *Client) leaveRoom(msg Message) {
-	fmt.Println("message client switch 3", msg)
 	room := c.Server.FindRoom(msg.Body)
 	room.UnRegister <- c
+	room.Broadcast <- msg
 	delete(c.Rooms, room)
 }
 

@@ -9,11 +9,11 @@ import (
 
 func routes() http.Handler {
 	mux := chi.NewRouter()
-	
+
 	mux.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 	}))
 
 	mux.Post("/user/register", handler.Repo.RegisterUser)
@@ -25,6 +25,7 @@ func routes() http.Handler {
 	mux.Post("/room/join", handler.Repo.JoinRoom)
 	mux.Post("/room/update", handler.Repo.UpdateRoom)
 	mux.Post("/room/leave", handler.Repo.LeaveRoom)
+	mux.Post("/message/send", handler.Repo.SendMessage)
 	return mux
 
 }
