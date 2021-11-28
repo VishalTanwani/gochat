@@ -13,25 +13,27 @@ import { StateContext } from "../context/StateProvider";
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages } = useContext(StateContext);
+  const { currentRoom, user, leftRoom, getMessages, messages } = useContext(
+    StateContext
+  );
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
-    async function fetchData(){
-      await joinRoom()
-      await getMessages(currentRoom.name, currentRoom._id)
+    async function fetchData() {
+      await getMessages(currentRoom.name, currentRoom._id);
+      await joinRoom();
     }
-    fetchData()
+    fetchData();
     return () => {
-      setChats([])
-    }
-  }, [currentRoom])
+      setChats([]);
+    };
+  }, [currentRoom]);
 
   useEffect(() => {
-    setChats(messages)
-  }, [messages])
+    setChats(messages);
+  }, [messages]);
 
   useEffect(() => {
     var scrollDiv = document.getElementById("chats");
@@ -67,7 +69,7 @@ const Chat = () => {
           type: "message",
           room: currentRoom.name,
           room_id: currentRoom._id,
-          token: window.localStorage["token"]
+          token: window.localStorage["token"],
         })
       );
       await setMessage("");
@@ -79,13 +81,13 @@ const Chat = () => {
   const joinRoom = () => {
     socket.send(
       JSON.stringify({
-        body: user.name+"<check> joined",
+        body: user.name + "<check> joined",
         user_id: user._id,
         user_name: user.name,
         type: "joinRoom",
         room: currentRoom.name,
         room_id: currentRoom._id,
-        token: window.localStorage["token"]
+        token: window.localStorage["token"],
       })
     );
   };
@@ -93,60 +95,80 @@ const Chat = () => {
   const leavRoom = () => {
     socket.send(
       JSON.stringify({
-        body: user.name+"<check> left",
+        body: user.name + "<check> left",
         user_id: user._id,
         user_name: user.name,
         type: "leaveRoom",
         room: currentRoom.name,
         room_id: currentRoom._id,
-        token: window.localStorage["token"]
+        token: window.localStorage["token"],
       })
     );
-    leftRoom()
+    leftRoom();
   };
 
-  let d = new Date()
-  let hours = d.getHours()
-  let minutes = d.getMinutes()
+  let d = new Date();
+  let hours = d.getHours();
+  let minutes = d.getMinutes();
   return (
     <div className="chat">
-      {currentRoom &&<header className="chatHeader">
-        <Avatar src={currentRoom.group_icon}/>
-        <div className="chatHeaderData">
-          <h3>{currentRoom.name}</h3>
-          <p>last seen at ...</p>
-        </div>
-        <div className="chatHeaderRight">
-          <IconButton>
-            <SearchOutlinedIcon />
-          </IconButton>
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-          <IconButton onClick={leavRoom}>
-            <ExitToAppIcon />
-          </IconButton>
-        </div>
-      </header>}
-      <div id="chats" className="chatBody">
-        {chats && chats.map((data, i) =>
-          data.type === "message" ? (
-            <div
-              key={i}
-              className={`chatMessage ${
-                data.user_id === user._id && "chatSender"
-              }`}
-            >
-              <p >{data.user_name}</p>
-              <p className="dataMessage">{data.body}</p>
-              <div className="chatTimeStamp">{hours+":"+minutes}</div>
-            </div>
-          ) : (
-            <p key={i} className={`chatJoinOrLeft`}>
-              {data.user_id === user._id ? "you"+data.body.split("<check>")[1]: data.body.split("<check>")[0]+data.body.split("<check>")[1]}
+      {currentRoom && (
+        <header className="chatHeader">
+          <Avatar src={currentRoom.group_icon} />
+          <div className="chatHeaderData">
+            <h3>{currentRoom.name}</h3>
+            <p className="chatUsers">
+              {currentRoom.type === "public"
+                ? currentRoom.users.toString()
+                : ""}
             </p>
-          )
-        )}
+          </div>
+          <div className="chatHeaderRight">
+            <IconButton>
+              <SearchOutlinedIcon />
+            </IconButton>
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+            <IconButton onClick={leavRoom}>
+              <ExitToAppIcon />
+            </IconButton>
+          </div>
+        </header>
+      )}
+      <div id="chats" className="chatBody">
+        {chats &&
+          chats
+            .filter((x) => x.room === currentRoom.name)
+            .map((data, i) =>
+              data.type === "message" ? (
+                <div
+                  key={i}
+                  className={`chatMessage ${
+                    data.user_id === user._id && "chatSender"
+                  }`}
+                >
+                  <p>{data.user_name}</p>
+                  <p className="dataMessage">{data.body}</p>
+                  <div className="chatTimeStamp">
+                    {new Date(
+                      data.create_at ? data.create_at * 1000 : new Date()
+                    ).getHours() +
+                      ":" +
+                      new Date(
+                        data.create_at ? data.create_at * 1000 : new Date()
+                      ).getMinutes()}
+                  </div>
+                </div>
+              ) : (
+                <p key={i} className={`chatJoinOrLeft`}>
+                  {data.user_id === user._id
+                    ? "you" + data.body.split("<check>")[1]
+                    : data.body.split("<check>")[0] +
+                      data.body.split("<check>")[1]}
+                </p>
+              )
+            )}
       </div>
       <footer className="chatFooter">
         <EmojiEmotionsOutlinedIcon />

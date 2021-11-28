@@ -28,10 +28,11 @@
 }
 .chatBody{
     flex: 1;
+    padding-top: 10px;
     background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
     background-repeat: repeat;
     background-position: center;
-    padding: 0px 5.5%;
+    padding: 10px 5.5% 0px;
     overflow: auto;
 }
 .chatMessage{
@@ -105,4 +106,9 @@
 .chatFooter > .MuiSvgIcon-root {
     padding: 10px;
     color: gray;
+}
+.chatUsers {
+    width: 50vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

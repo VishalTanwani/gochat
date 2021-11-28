@@ -541,15 +541,35 @@ func (m *Repository) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if check {
-		temp.Token = ""
-		temp.CreatedAt = time.Now().Unix()
-		res, err := m.DB.SendMessage(temp)
+		room,err := m.DB.GetRoomByID(primtiveObjToString(temp.RoomID))
 		if err == nil {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"meesage": ` + res + `}`))
+			mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+			if temp.Type == "joinRoom" {
+				for _,v := range room.Users {
+					if v == fmt.Sprint(mapData["email"]){
+						return
+					}
+				}
+			}
+			temp.Token = ""
+			temp.CreatedAt = time.Now().Unix()
+			res, err := m.DB.SendMessage(temp)
+			if err == nil {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`{"meesage": ` + res + `}`))
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"meesage": "cannot send room" }`))
+				return
+			}
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"meesage": "cannot send room" }`))
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
 			return
 		}
 
@@ -592,7 +612,7 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 					messages,err := m.DB.GetMessagesByRoom(temp.Name)
 					if err == nil {
 						sort.Slice(messages, func(i,j int) bool {
-							return messages[i].CreatedAt > messages[j].CreatedAt
+							return messages[i].CreatedAt < messages[j].CreatedAt
 						})
 						json.NewEncoder(w).Encode(messages)
 						return

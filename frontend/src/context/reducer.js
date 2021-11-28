@@ -66,7 +66,7 @@ const reducer = (state, action) => {
         case "GET_MESSAGES":
             return{
                 ...state,
-                messages: action.payload
+                messages: action.payload === null ? [] : action.payload
             }
         default:
             return state;
