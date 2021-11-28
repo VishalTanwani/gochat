@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
 import SendIcon from "@material-ui/icons/Send";
-import { nanoid } from "nanoid";
 import "./chat.css";
 import { Avatar, IconButton } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -14,18 +13,25 @@ import { StateContext } from "../context/StateProvider";
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user } = useContext(StateContext);
+  const { currentRoom, user, leftRoom, getMessages, messages } = useContext(StateContext);
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
-    joinRoom()
+    async function fetchData(){
+      await joinRoom()
+      await getMessages(currentRoom.name, currentRoom._id)
+    }
+    fetchData()
     return () => {
       setChats([])
-      leavRoom()
     }
   }, [currentRoom])
+
+  useEffect(() => {
+    setChats(messages)
+  }, [messages])
 
   useEffect(() => {
     var scrollDiv = document.getElementById("chats");
@@ -60,6 +66,7 @@ const Chat = () => {
           user_name: user.name,
           type: "message",
           room: currentRoom.name,
+          room_id: currentRoom._id,
           token: window.localStorage["token"]
         })
       );
@@ -72,11 +79,12 @@ const Chat = () => {
   const joinRoom = () => {
     socket.send(
       JSON.stringify({
-        body: currentRoom.name,
+        body: user.name+"<check> joined",
         user_id: user._id,
         user_name: user.name,
         type: "joinRoom",
         room: currentRoom.name,
+        room_id: currentRoom._id,
         token: window.localStorage["token"]
       })
     );
@@ -85,14 +93,16 @@ const Chat = () => {
   const leavRoom = () => {
     socket.send(
       JSON.stringify({
-        body: currentRoom.name,
+        body: user.name+"<check> left",
         user_id: user._id,
         user_name: user.name,
         type: "leaveRoom",
         room: currentRoom.name,
+        room_id: currentRoom._id,
         token: window.localStorage["token"]
       })
     );
+    leftRoom()
   };
 
   let d = new Date()
@@ -113,13 +123,13 @@ const Chat = () => {
           <IconButton>
             <MoreVertIcon />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={leavRoom}>
             <ExitToAppIcon />
           </IconButton>
         </div>
       </header>}
       <div id="chats" className="chatBody">
-        {chats.map((data, i) =>
+        {chats && chats.map((data, i) =>
           data.type === "message" ? (
             <div
               key={i}
@@ -133,15 +143,7 @@ const Chat = () => {
             </div>
           ) : (
             <p key={i} className={`chatJoinOrLeft`}>
-              {data.type === "joinRoom"
-                ? `${
-                    data.user_id === user._id
-                      ? "you joined"
-                      : `${data.user_name} joined`
-                  }`
-                : `${
-                    data.user_id === user._id ? "you left" : `${data.user_name} left`
-                  }`}
+              {data.user_id === user._id ? "you"+data.body.split("<check>")[1]: data.body.split("<check>")[0]+data.body.split("<check>")[1]}
             </p>
           )
         )}

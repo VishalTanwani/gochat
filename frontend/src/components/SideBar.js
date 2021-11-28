@@ -15,6 +15,7 @@ function SideBar() {
     userRooms,
     getRooms,
     openProfile,
+    currentRoom
   } = useContext(StateContext);
   const [search, setSearch] = useState("");
 
@@ -24,7 +25,7 @@ function SideBar() {
       window.localStorage["token"] && (await getRooms());
     }
     fetchData();
-  }, []);
+  }, [currentRoom]);
 
   const onSubmit = () => {
     console.log("object");

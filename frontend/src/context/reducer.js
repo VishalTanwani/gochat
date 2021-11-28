@@ -5,6 +5,7 @@ export const initialState = {
     alertStatus: null,
     alertMessage: null,
     profileStatue: null,
+    messages: [],
 }
 
 export const actionTypes = {
@@ -15,6 +16,8 @@ export const actionTypes = {
     TRANSACTION_ERROR: "TRANSACTION_ERROR",
     PROFILE_OPNER: "PROFILE_OPNER",
     SET_ROOM: "SET_ROOM",
+    LEFT_ROOM: "LEFT_ROOM",
+    GET_MESSAGES: "GET_MESSAGES",
 }
 
 const reducer = (state, action) => {
@@ -54,6 +57,16 @@ const reducer = (state, action) => {
             return{
                 ...state,
                 currentRoom: action.payload
+            }
+        case "LEFT_ROOM":
+            return{
+                ...state,
+                currentRoom: null
+            }
+        case "GET_MESSAGES":
+            return{
+                ...state,
+                messages: action.payload
             }
         default:
             return state;

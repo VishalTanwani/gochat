@@ -13,8 +13,8 @@ export const StateProvider = ({ children }) => {
     alertStatus: state.alertStatus,
     alertMessage: state.alertMessage,
     profileStatue: state.profileStatue,
+    messages: state.messages,
     unifiedRegister: async (email) => {
-      console.log(email)
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
           "Content-Type": "application/json",
@@ -137,6 +137,50 @@ export const StateProvider = ({ children }) => {
             message: "Network error",
           });
         });
+    },
+    leftRoom: () => {
+      axios
+      .post(process.env.REACT_APP_API_ENDPOINT + "/room/leave", {
+        "Content-Type": "application/json",
+        token: window.localStorage["token"],
+      })
+      .then(function () {
+        dispatch({
+          type: actionTypes.LEFT_ROOM
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+        dispatch({
+          type: actionTypes.TRANSACTION_ERROR,
+          status: true,
+          message: "Network error",
+        });
+      });
+      
+    },
+    getMessages: (room,id) => {
+      console.log(room)
+      axios.post(process.env.REACT_APP_API_ENDPOINT + "/message/get", {
+        "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          name: room,
+          _id: id
+      })
+      .then(function (response) {
+        dispatch({
+          type: actionTypes.GET_MESSAGES,
+          payload: response.data,
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+        dispatch({
+          type: actionTypes.TRANSACTION_ERROR,
+          status: true,
+          message: "Network error",
+        });
+      });
     }
   };
   return (

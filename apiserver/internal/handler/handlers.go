@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"sort"
 )
 
 //Repository is repository type
@@ -552,6 +553,65 @@ func (m *Repository) SendMessage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//GetMessagesByRoom will give messages of room
+func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+			if err != nil {
+				m.App.ErrorLog.Println("error at decoding token")
+				helpers.ServerError(w, err)
+				return
+			}
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
+		if err == nil{
+			for _,v := range room.Users {
+				if v == fmt.Sprint(mapData["email"]) {
+					messages,err := m.DB.GetMessagesByRoom(temp.Name)
+					if err == nil {
+						sort.Slice(messages, func(i,j int) bool {
+							return messages[i].CreatedAt > messages[j].CreatedAt
+						})
+						json.NewEncoder(w).Encode(messages)
+						return
+					} else {
+						w.WriteHeader(http.StatusInternalServerError)
+						w.Write([]byte(`{"meesage": "some error occured" }`))
+						return
+					}
+				}
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "You are not in a room" }`))
+			return
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
+			return
+		}
+		
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"meesage": "token invalidation" }`))

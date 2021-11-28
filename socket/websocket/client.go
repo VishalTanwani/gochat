@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"github.com/gorilla/websocket"
+	"fmt"
 )
 
 //Client struct
@@ -34,7 +35,7 @@ func (c *Client) Read() {
 		var msg Message
 		err := c.Conn.ReadJSON(&msg)
 		if err != nil {
-			panic(err)
+			fmt.Println("at client read",err)
 			return
 		}
 
@@ -56,9 +57,9 @@ func (c *Client) sendMessage(msg Message) {
 }
 
 func (c *Client) joinRoom(msg Message) {
-	room := c.Server.FindRoom(msg.Body)
+	room := c.Server.FindRoom(msg.Room)
 	if room == nil {
-		room = c.Server.CreateRoom(msg.Body)
+		room = c.Server.CreateRoom(msg.Room)
 	}
 	c.Rooms[room] = true
 	c.ID = msg.UserID
@@ -70,7 +71,7 @@ func (c *Client) joinRoom(msg Message) {
 }
 
 func (c *Client) leaveRoom(msg Message) {
-	room := c.Server.FindRoom(msg.Body)
+	room := c.Server.FindRoom(msg.Room)
 	room.UnRegister <- c
 	room.Broadcast <- msg
 	delete(c.Rooms, room)

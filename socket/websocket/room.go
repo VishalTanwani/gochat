@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"fmt"
 	"net/http"
 )
 
@@ -46,7 +47,7 @@ func (room *Room) StartRoom() {
 		case msg := <-room.Broadcast:
 			_, err := SendDataToDB(msg)
 			if err != nil {
-				panic(err)
+				fmt.Println("at startroom ",err)
 			}
 			room.writeMessageForRoom(msg)
 		}
