@@ -43,10 +43,10 @@ func (server *Server) Start() {
 }
 
 //FindRoom will find room
-func (server *Server) FindRoom(name string) *Room {
+func (server *Server) FindRoom(id string) *Room {
 	var room *Room
 	for rm := range server.Rooms {
-		if rm.Name == name {
+		if rm.ID == id {
 			room = rm
 		}
 	}
@@ -54,8 +54,8 @@ func (server *Server) FindRoom(name string) *Room {
 }
 
 //CreateRoom will create room
-func (server *Server) CreateRoom(name string) *Room {
-	room := NewRoom(name)
+func (server *Server) CreateRoom(id string) *Room {
+	room := NewRoom(id)
 	server.Rooms[room] = true
 	go room.StartRoom()
 	return room

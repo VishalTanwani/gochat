@@ -1,15 +1,12 @@
 package websocket
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"fmt"
-	"net/http"
 )
 
 //Room struct
 type Room struct {
+	ID string
 	Name       string
 	Register   chan *Client
 	UnRegister chan *Client
@@ -18,9 +15,9 @@ type Room struct {
 }
 
 //NewRoom is for creatng new pool
-func NewRoom(name string) *Room {
+func NewRoom(id string) *Room {
 	return &Room{
-		Name:       name,
+		ID:       id,
 		Register:   make(chan *Client),
 		UnRegister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
@@ -47,26 +44,9 @@ func (room *Room) StartRoom() {
 		case msg := <-room.Broadcast:
 			_, err := SendDataToDB(msg)
 			if err != nil {
-				fmt.Println("at startroom ",err)
+				fmt.Println("at startroom ", err)
 			}
 			room.writeMessageForRoom(msg)
 		}
 	}
-}
-
-//SendDataToDB will send data to mongo db
-func SendDataToDB(msg Message) (string, error) {
-	jsonReq, err := json.Marshal(msg)
-	if err != nil {
-		return "", err
-	}
-	resp, err := http.Post("http://localhost:4000/message/send", "application/json; charset=utf-8", bytes.NewBuffer(jsonReq))
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	// Convert response body to string
-	bodyString := string(bodyBytes)
-	return bodyString, nil
 }

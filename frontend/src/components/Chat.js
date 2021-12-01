@@ -48,7 +48,6 @@ const Chat = () => {
     };
 
     socket.onmessage = (msg) => {
-      console.log(JSON.parse(msg.data));
       setChats([...chats, JSON.parse(msg.data)]);
     };
 
@@ -60,7 +59,6 @@ const Chat = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.length !== 0) {
-      console.log(message);
       await socket.send(
         JSON.stringify({
           body: message,
@@ -106,10 +104,7 @@ const Chat = () => {
     );
     leftRoom();
   };
-
-  let d = new Date();
-  let hours = d.getHours();
-  let minutes = d.getMinutes();
+  
   return (
     <div className="chat">
       {currentRoom && (
@@ -126,9 +121,6 @@ const Chat = () => {
           <div className="chatHeaderRight">
             <IconButton>
               <SearchOutlinedIcon />
-            </IconButton>
-            <IconButton>
-              <MoreVertIcon />
             </IconButton>
             <IconButton onClick={leavRoom}>
               <ExitToAppIcon />
