@@ -5,6 +5,7 @@ export const initialState = {
     alertStatus: null,
     alertMessage: null,
     profileStatue: null,
+    groupDescStatus: null,
     messages: [],
 }
 
@@ -18,6 +19,7 @@ export const actionTypes = {
     SET_ROOM: "SET_ROOM",
     LEFT_ROOM: "LEFT_ROOM",
     GET_MESSAGES: "GET_MESSAGES",
+    GROUP_DESC_OPENER: "GROUP_DESC_OPENER",
 }
 
 const reducer = (state, action) => {
@@ -48,6 +50,11 @@ const reducer = (state, action) => {
                 ...state,
                 profileStatue: action.status
             }
+        case "GROUP_DESC_OPENER":
+                return {
+                    ...state,
+                    groupDescStatus: action.status
+                }
         case "UPDATE_USER":
             return{
                 ...state,

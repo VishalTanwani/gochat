@@ -5,10 +5,11 @@ import { StateContext } from "../context/StateProvider";
 
 function Conversation(props) {
   const { data } = props;
-  const { selectRoom, currentRoom } = useContext(StateContext);
+  const { selectRoom, currentRoom, openGroupDesc } = useContext(StateContext);
 
   const handleClick = () => {
     selectRoom(data._id);
+    openGroupDesc(false)
   };
 
   return (

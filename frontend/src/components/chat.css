@@ -1,5 +1,10 @@
 .chat{
-    flex: 0.7;
+    display: flex;
+    width: 70vw;
+    flex-direction: column;
+}
+.chat1{
+    width: 40vw;
     display: flex;
     flex-direction: column;
 }
@@ -7,19 +12,25 @@
     padding: 10px 16px;
     display: flex;
     align-items: center;
+    cursor: pointer;
+    align-items: center;
     border-bottom: 1px solid lightgray;
     box-sizing: border-box;
 }
 .chatHeaderData{
-    flex: 1;
+    display: flex;
+    width: 100%;
     padding-left: 20px;
+    min-width: 0;
 }
-.chatHeaderData > h3 {
+
+.chatHeaderData > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chatHeaderData > div > h3 {
     margin-bottom: 3px;
     font-weight: 500;
-}
-.chatHeaderData > p {
-    color: gray;
 }
 .chatHeaderRight{
     display: flex;
@@ -111,4 +122,15 @@
     width: 50vw;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: gray;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.chatUsers1 {
+    width: 35vw;
+    overflow: hidden;
+    color: gray;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

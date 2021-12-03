@@ -4,6 +4,7 @@ import Routes from "./Routes";
 import { StateProvider } from "./context/StateProvider";
 import Alert from "./components/Alert";
 import Profile from "./components/Profile";
+import GroupDesc from "./components/GroupDesc";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Profile />
           <Routes />
           <Alert />
+          <GroupDesc/>
         </StateProvider>
       </div>
     </div>

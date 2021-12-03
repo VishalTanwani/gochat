@@ -20,6 +20,8 @@ function Profile() {
     }, [user])
 
     const handleClick = () => {
+        setNameCheck(true)
+        setAboutCheck(true)
         openProfile(false)
     }
 
@@ -67,7 +69,7 @@ function Profile() {
                             }
                             {nameCheck 
                                 ? <CreateIcon onClick={clickName}/>
-                                :<DoneIcon onClick={onNameSubmit}/>
+                                : <DoneIcon onClick={onNameSubmit}/>
                             }
                         </div>
                     </div>

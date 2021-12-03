@@ -8,6 +8,7 @@
     border-right: 1px solid lightgray;
     background-color: #ededed;
     z-index: 1;
+    overflow-y: scroll;
 }
 .profile-header{
     padding: 55px 20px 10px 20px;

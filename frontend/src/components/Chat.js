@@ -13,7 +13,7 @@ import { StateContext } from "../context/StateProvider";
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus } = useContext(
     StateContext
   );
 
@@ -106,17 +106,19 @@ const Chat = () => {
   };
   
   return (
-    <div className="chat">
+    <div className={groupDescStatus ? "chat1" : "chat"}>
       {currentRoom && (
-        <header className="chatHeader">
+        <header className="chatHeader" onClick={() => openGroupDesc(true)}>
           <Avatar src={currentRoom.group_icon} />
           <div className="chatHeaderData">
+            <div>
             <h3>{currentRoom.name}</h3>
-            <p className="chatUsers">
+            <span className={groupDescStatus ? "chatUsers1" : "chatUsers"}>
               {currentRoom.type === "public"
-                ? currentRoom.users.toString()
+                ? currentRoom.users.join(", ")
                 : ""}
-            </p>
+            </span>
+            </div>
           </div>
           <div className="chatHeaderRight">
             <IconButton>

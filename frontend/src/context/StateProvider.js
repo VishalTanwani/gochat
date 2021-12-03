@@ -14,6 +14,7 @@ export const StateProvider = ({ children }) => {
     alertMessage: state.alertMessage,
     profileStatue: state.profileStatue,
     messages: state.messages,
+    groupDescStatus: state.groupDescStatus,
     unifiedRegister: async (email) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
@@ -116,6 +117,12 @@ export const StateProvider = ({ children }) => {
         status: status,
       });
     },
+    openGroupDesc: (status) => {
+      dispatch({
+        type: actionTypes.GROUP_DESC_OPENER,
+        status: status,
+      });
+    },
     selectRoom: (_id) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/room/details", {
@@ -160,7 +167,6 @@ export const StateProvider = ({ children }) => {
       
     },
     getMessages: (room,id) => {
-      console.log(room)
       axios.post(process.env.REACT_APP_API_ENDPOINT + "/message/get", {
         "Content-Type": "application/json",
           token: window.localStorage["token"],
@@ -170,6 +176,30 @@ export const StateProvider = ({ children }) => {
       .then(function (response) {
         dispatch({
           type: actionTypes.GET_MESSAGES,
+          payload: response.data,
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+        dispatch({
+          type: actionTypes.TRANSACTION_ERROR,
+          status: true,
+          message: "Network error",
+        });
+      });
+    },
+    updateRoom: (name, description) => {
+      axios
+      .post(process.env.REACT_APP_API_ENDPOINT + "/room/update", {
+        "Content-Type": "application/json",
+        token: window.localStorage["token"],
+        _id: state.currentRoom._id,
+        name: name,
+        description: description,
+      })
+      .then(function (response) {
+        dispatch({
+          type: actionTypes.SET_ROOM,
           payload: response.data,
         });
       })
