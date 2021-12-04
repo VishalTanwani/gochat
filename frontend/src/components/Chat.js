@@ -43,7 +43,7 @@ const Chat = () => {
       console.log("connected");
     };
 
-    socket.onclose = (event) => {
+    socket.onclose = () => {
       console.log("Closed Connection");
     };
 
@@ -71,8 +71,6 @@ const Chat = () => {
         })
       );
       await setMessage("");
-    } else {
-      console.log("object");
     }
   };
 
@@ -104,7 +102,7 @@ const Chat = () => {
     );
     leftRoom();
   };
-  
+
   return (
     <div className={groupDescStatus ? "chat1" : "chat"}>
       {currentRoom && (
@@ -133,7 +131,7 @@ const Chat = () => {
       <div id="chats" className="chatBody">
         {chats &&
           chats
-            .filter((x) => x.room === currentRoom.name)
+            .filter((x) => x.room_id === currentRoom._id)
             .map((data, i) =>
               data.type === "message" ? (
                 <div

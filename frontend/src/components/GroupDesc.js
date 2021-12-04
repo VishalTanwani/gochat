@@ -6,20 +6,18 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloseIcon from '@material-ui/icons/Close';
 import CreateIcon from '@material-ui/icons/Create';
 import DoneIcon from '@material-ui/icons/Done';
+import { socketFunctions } from "./socket"
 
 function Profile() {
-    const { groupDescStatus, openGroupDesc, currentRoom, leftRoom, updateRoom } = useContext(StateContext)
+    const { groupDescStatus, openGroupDesc, currentRoom, leftRoom, updateRoom, user } = useContext(StateContext)
     const [name, setName] = useState("")
     const [nameCheck, setNameCheck] = useState(true)
     const [about, setAbout] = useState("")
     const [aboutCheck, setAboutCheck] = useState(true)
 
     useEffect(() => {
-        async function fetchData(){
-            await setName(currentRoom && currentRoom.name)
-            await setAbout(currentRoom && currentRoom.description)
-        }
-        fetchData()
+        setName(currentRoom && currentRoom.name)
+        setAbout(currentRoom && currentRoom.description)
     }, [currentRoom])
 
     const handleClose = () => {
@@ -30,11 +28,47 @@ function Profile() {
 
     const onNameSubmit = async () => {
         await updateRoom(name, about)
+        socketFunctions.sendMessage({
+            body: user && user.name + "<check> joined",
+            user_id: user && user._id,
+            user_name: user && user.name,
+            type: "joinRoom",
+            room: currentRoom && currentRoom.name,
+            room_id: currentRoom && currentRoom._id,
+            token: window.localStorage["token"],
+        })
+        socketFunctions.sendMessage({
+            body: user.name + "<check> changed group name to " + name ,
+            user_id: user._id,
+            user_name: user.name,
+            type: "info",
+            room: name,
+            room_id: currentRoom._id,
+            token: window.localStorage["token"],
+        })
         await setNameCheck(!nameCheck)
     }
 
     const onAboutSubmit = async () => {
         await updateRoom(name, about)
+        socketFunctions.sendMessage({
+            body: user && user.name + "<check> joined",
+            user_id: user && user._id,
+            user_name: user && user.name,
+            type: "joinRoom",
+            room: currentRoom && currentRoom.name,
+            room_id: currentRoom && currentRoom._id,
+            token: window.localStorage["token"],
+        })
+        socketFunctions.sendMessage({
+            body: user.name + "<check> changed group description to " + about,
+            user_id: user._id,
+            user_name: user.name,
+            type: "info",
+            room: name,
+            room_id: currentRoom._id,
+            token: window.localStorage["token"],
+        })
         await setAboutCheck(!aboutCheck)
     }
 

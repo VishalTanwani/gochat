@@ -15,7 +15,7 @@ export const StateProvider = ({ children }) => {
     profileStatue: state.profileStatue,
     messages: state.messages,
     groupDescStatus: state.groupDescStatus,
-    unifiedRegister: async (email) => {
+    unifiedRegister: (email) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
           "Content-Type": "application/json",

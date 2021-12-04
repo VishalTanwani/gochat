@@ -42,6 +42,8 @@ func (c *Client) Read() {
 		switch msg.Type {
 		case "message":
 			c.sendMessage(msg)
+		case "info":
+			c.sendMessage(msg)
 		case "joinRoom":
 			c.joinRoom(msg)
 		case "leaveRoom":

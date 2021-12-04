@@ -188,12 +188,16 @@ func (m *mongoDBRepo) SendMessage(message models.MessageWithToken) (string, erro
 	return "Message sent", nil
 }
 
-func (m *mongoDBRepo) GetMessagesByRoom(room string) ([]models.Message, error) {
+func (m *mongoDBRepo) GetMessagesByRoom(id string) ([]models.Message, error) {
 	collection := m.DB.Database("gochat").Collection("messages")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var messages []models.Message
-	cursor,err := collection.Find(ctx, bson.D{{"room", room}})
+	roomID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return messages, err
+	}
+	cursor,err := collection.Find(ctx, bson.D{{"room_id", roomID}})
 	if err != nil {
 		return messages, err
 	}

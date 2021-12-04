@@ -27,7 +27,7 @@
     color: white;
 }
 
-.login-form{
+.login-form {
     display: flex;
     margin-top: 20px;
     justify-content: space-between;
@@ -35,11 +35,15 @@
     border-bottom: 2px solid #00bfa5;
 }
 
-.login-form > input {
+.login-form > form > input {
     outline: 0px;
     border: 0px;
     font-size: 15px;
     background-color: white;
+}
+
+.login-form > form > button {
+    display: none;
 }
 
 .login-form > .MuiButtonBase-root{

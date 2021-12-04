@@ -609,7 +609,7 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 		if err == nil{
 			for _,v := range room.Users {
 				if v == fmt.Sprint(mapData["email"]) {
-					messages,err := m.DB.GetMessagesByRoom(temp.Name)
+					messages,err := m.DB.GetMessagesByRoom(primtiveObjToString(temp.ID))
 					if err == nil {
 						sort.Slice(messages, func(i,j int) bool {
 							return messages[i].CreatedAt < messages[j].CreatedAt
