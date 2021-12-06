@@ -259,6 +259,12 @@ export const StateProvider = ({ children }) => {
           });
         });
     },
+    createRoom: (response) => {
+          dispatch({
+            type: actionTypes.SET_ROOM,
+            payload: response.data,
+          });
+    },
     sendMessage: (msg) => {
       axios.post(process.env.REACT_APP_API_ENDPOINT + "/message/send", {
         "Content-Type": "application/json",
@@ -276,6 +282,17 @@ export const StateProvider = ({ children }) => {
           message: "Network error",
         });
       });
+    },
+    displayError: (err) => {
+      dispatch({
+        type: actionTypes.TRANSACTION_ERROR,
+        status: true,
+        message: "Network error",
+      });
+    },
+    logout: () => {
+      window.localStorage.clear()
+      window.location.href = "/login"
     }
   };
   return (

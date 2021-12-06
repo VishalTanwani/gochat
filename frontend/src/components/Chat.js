@@ -12,7 +12,7 @@ import { StateContext } from "../context/StateProvider";
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, joinGroup } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus } = useContext(
     StateContext
   );
 
@@ -112,7 +112,7 @@ const Chat = () => {
             <h3>{currentRoom.name}</h3>
             <span className={groupDescStatus ? "chatUsers1" : "chatUsers"}>
               {currentRoom.type === "public"
-                ? currentRoom.users.join(", ")
+                ? currentRoom.users && currentRoom.users.join(", ")
                 : ""}
             </span>
             </div>

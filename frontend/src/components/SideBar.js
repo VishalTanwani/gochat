@@ -1,6 +1,6 @@
 import "./sidebar.css";
 import React, { useContext, useEffect, useState } from "react";
-import { Avatar, IconButton } from "@material-ui/core";
+import { Avatar, IconButton, Menu, MenuItem } from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -18,8 +18,11 @@ function SideBar() {
     currentRoom,
     searchRoom,
     searchRooms,
+    logout
   } = useContext(StateContext);
   const [search, setSearch] = useState("");
+  const [anchorEl, setAnchorEl] = useState(false)
+  const open = Boolean(anchorEl);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,6 +43,16 @@ function SideBar() {
     openProfile(true);
   };
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (text) => {
+    console.log(text)
+    text==="Logout" && logout()
+    setAnchorEl(null)
+  }
+
   return (
     <div className="sidebar">
       <header className="header">
@@ -52,9 +65,21 @@ function SideBar() {
             <IconButton>
               <ChatIcon />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={handleClick}>
               <MoreVertIcon />
             </IconButton>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              style={{top:"40px", left:"-50px"}}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+            >
+              <MenuItem onClick={()=>handleClose("Logout")}>Logout</MenuItem>
+            </Menu>
           </div>
         </>
       </header>
@@ -78,15 +103,16 @@ function SideBar() {
         </div>
       </div>
       <div className="conversations">
+        {search!=="" && searchRooms.length===0 && <Conversation type="create" search={search} setSearch={setSearch}/>}
         {searchRooms &&
           searchRooms.length !== 0 &&
           searchRooms.map((x, i) => (
-            <Conversation key={i} data={x} type="search" setSearch={setSearch}/>
+            <Conversation key={i} data={x} type="search" search={search} setSearch={setSearch}/>
           ))}
-        {searchRooms && searchRooms.length === 0
+        {search === "" && searchRooms.length === 0
           ? userRooms &&
             userRooms.map((x, i) => (
-              <Conversation key={i} data={x} type="room" />
+              <Conversation key={i} data={x} search={search} type="room" />
             ))
           : null}
       </div>

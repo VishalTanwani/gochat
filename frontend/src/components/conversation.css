@@ -24,10 +24,10 @@
     margin-bottom: 8px;
 }
 .conversation-join{
-    font-size: 16px;
+    font-size: 12px;
     padding: 5px 10px;
     color: #00bfa5;
-    border: 2px solid #00bfa5;
+    border: 1px solid #00bfa5;
     border-radius: 9999px;
     float: right;
 }
