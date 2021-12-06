@@ -15,6 +15,7 @@ export const StateProvider = ({ children }) => {
     profileStatue: state.profileStatue,
     messages: state.messages,
     groupDescStatus: state.groupDescStatus,
+    searchRooms: state.searchRooms,
     unifiedRegister: (email) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
@@ -145,15 +146,39 @@ export const StateProvider = ({ children }) => {
           });
         });
     },
-    leftRoom: () => {
+    leftRoom: (id) => {
       axios
       .post(process.env.REACT_APP_API_ENDPOINT + "/room/leave", {
         "Content-Type": "application/json",
         token: window.localStorage["token"],
+        _id:id
       })
       .then(function () {
         dispatch({
           type: actionTypes.LEFT_ROOM
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+        dispatch({
+          type: actionTypes.TRANSACTION_ERROR,
+          status: true,
+          message: "Network error",
+        });
+      });
+      
+    },
+    joinGroup: (id) => {
+      axios
+      .post(process.env.REACT_APP_API_ENDPOINT + "/room/join", {
+        "Content-Type": "application/json",
+        token: window.localStorage["token"],
+        _id: id
+      })
+      .then(function (response) {
+        dispatch({
+          type: actionTypes.SET_ROOM,
+          payload: response.data,
         })
       })
       .catch(function (error) {
@@ -202,6 +227,46 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.SET_ROOM,
           payload: response.data,
         });
+      })
+      .catch(function (error) {
+        console.log(error);
+        dispatch({
+          type: actionTypes.TRANSACTION_ERROR,
+          status: true,
+          message: "Network error",
+        });
+      });
+    },
+    searchRoom: (name) => {
+      axios
+        .post(process.env.REACT_APP_API_ENDPOINT + "/room/search", {
+          "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          name: name,
+        })
+        .then(function (response) {
+          dispatch({
+            type: actionTypes.SEARCH_ROOM,
+            payload: name === "" ? [] : response.data,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          dispatch({
+            type: actionTypes.TRANSACTION_ERROR,
+            status: true,
+            message: "Network error",
+          });
+        });
+    },
+    sendMessage: (msg) => {
+      axios.post(process.env.REACT_APP_API_ENDPOINT + "/message/send", {
+        "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          ...msg
+      })
+      .then(function (response) {
+        console.log(response)
       })
       .catch(function (error) {
         console.log(error);

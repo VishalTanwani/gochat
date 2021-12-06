@@ -15,7 +15,9 @@ function SideBar() {
     userRooms,
     getRooms,
     openProfile,
-    currentRoom
+    currentRoom,
+    searchRoom,
+    searchRooms,
   } = useContext(StateContext);
   const [search, setSearch] = useState("");
 
@@ -27,9 +29,12 @@ function SideBar() {
     fetchData();
   }, [currentRoom]);
 
-  const onSubmit = () => {
-    console.log("object");
-  };
+  const onSubmit = async(e) => {
+    e.preventDefault();
+    let value = e.target.value
+    await searchRoom(value)
+    await setSearch(value)
+  }
 
   const profileClick = () => {
     openProfile(true);
@@ -55,14 +60,15 @@ function SideBar() {
       </header>
       <div className="search">
         <div className="search-container">
-          <SearchOutlinedIcon style={{ fill: "gray", padding: "10px" }} />
+          <SearchOutlinedIcon
+            onClick={onSubmit}
+            style={{ fill: "gray", padding: "10px" }}
+          />
           <form onSubmit={onSubmit}>
             <input
               type="text"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
+              onChange={(e) => onSubmit(e)}
               placeholder="Search or start new chat"
             />
             <button onClick={onSubmit} type="submit">
@@ -72,8 +78,17 @@ function SideBar() {
         </div>
       </div>
       <div className="conversations">
-        {userRooms &&
-          userRooms.map((x, i) => <Conversation key={i} data={x} />)}
+        {searchRooms &&
+          searchRooms.length !== 0 &&
+          searchRooms.map((x, i) => (
+            <Conversation key={i} data={x} type="search" setSearch={setSearch}/>
+          ))}
+        {searchRooms && searchRooms.length === 0
+          ? userRooms &&
+            userRooms.map((x, i) => (
+              <Conversation key={i} data={x} type="room" />
+            ))
+          : null}
       </div>
     </div>
   );

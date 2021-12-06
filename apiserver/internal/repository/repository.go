@@ -13,7 +13,7 @@ type DatabaseRepo interface {
 	UpdateUser(u models.User) (string, error)
 	CreateRoom(room models.Room) (string, error)
 	GetRoomByID(id string) (models.Room, error)
-	GetRoomByName(name string) (models.Room, error)
+	GetRoomByName(name string) ([]models.Room, error)
 	CheckRoomAvaiability(name string) error
 	UpdateRoom(room models.Room) (string, error)
 	GetUserRooms(email string) ([]models.Room, error)

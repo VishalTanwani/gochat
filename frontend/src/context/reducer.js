@@ -1,6 +1,7 @@
 export const initialState = {
     user: null,
     userRooms: null,
+    searchRooms:[],
     currentRoom: null,
     alertStatus: null,
     alertMessage: null,
@@ -20,6 +21,7 @@ export const actionTypes = {
     LEFT_ROOM: "LEFT_ROOM",
     GET_MESSAGES: "GET_MESSAGES",
     GROUP_DESC_OPENER: "GROUP_DESC_OPENER",
+    SEARCH_ROOM: "SEARCH_ROOM"
 }
 
 const reducer = (state, action) => {
@@ -63,7 +65,8 @@ const reducer = (state, action) => {
         case "SET_ROOM":
             return{
                 ...state,
-                currentRoom: action.payload
+                currentRoom: action.payload,
+                searchRooms: []
             }
         case "LEFT_ROOM":
             return{
@@ -74,6 +77,11 @@ const reducer = (state, action) => {
             return{
                 ...state,
                 messages: action.payload === null ? [] : action.payload
+            }
+        case "SEARCH_ROOM":
+            return{
+                ...state,
+                searchRooms: action.payload === null ? [] : action.payload
             }
         default:
             return state;

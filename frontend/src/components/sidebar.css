@@ -40,11 +40,13 @@
 }
 .search-container > form > input {
     border: none;
+    width: 100%;
     margin-right: 10px;
     outline: none;
 }
 .conversations{
     flex: 1;
     background-color: white;
-    overflow: auto;
+    overflow-y: scroll;
+
 }

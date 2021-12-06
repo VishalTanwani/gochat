@@ -136,16 +136,25 @@ func (m *mongoDBRepo) GetRoomByID(id string) (models.Room, error) {
 }
 
 //GetRoomByName give the user by name
-func (m *mongoDBRepo) GetRoomByName(name string) (models.Room, error) {
-	var room models.Room
+func (m *mongoDBRepo) GetRoomByName(name string) ([]models.Room, error) {
+	var rooms []models.Room
 	collection := m.DB.Database("gochat").Collection("rooms")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	err := collection.FindOne(ctx, models.Room{Name: name}).Decode(&room)
+	cursor, err := collection.Find(ctx, bson.D{{Key:"name", Value: bson.D{{"$regex", primitive.Regex{Pattern:"^"+name, Options:"i"}},}}})
 	if err != nil {
-		return room, err
+		return rooms, err
 	}
-	return room, nil
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var room models.Room
+		cursor.Decode(&room)
+		rooms = append(rooms, room)
+	}
+	if err := cursor.Err(); err != nil {
+		return rooms, err
+	}
+	return rooms, nil
 }
 
 //CheckRoomAvaiability give the user by id

@@ -225,6 +225,39 @@ func (m *Repository) JoinRoom(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//SearchRoom will search a room by name
+func (m *Repository) SearchRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.RoomWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		return
+	}
+	if check {
+		rooms, err := m.DB.GetRoomByName(temp.Name)
+		if err == nil {
+			json.NewEncoder(w).Encode(rooms)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find room" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+
+}
+
 //LeaveRoom will leave a user to room
 func (m *Repository) LeaveRoom(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")

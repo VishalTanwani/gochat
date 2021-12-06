@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import SendIcon from "@material-ui/icons/Send";
 import "./chat.css";
 import { Avatar, IconButton } from "@material-ui/core";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import SearchOutlinedIcon from "@material-ui/icons/SearchOutlined";
 import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
@@ -13,7 +12,7 @@ import { StateContext } from "../context/StateProvider";
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, joinGroup } = useContext(
     StateContext
   );
 
@@ -100,15 +99,15 @@ const Chat = () => {
         token: window.localStorage["token"],
       })
     );
-    leftRoom();
+    leftRoom(currentRoom._id);
   };
 
   return (
     <div className={groupDescStatus ? "chat1" : "chat"}>
       {currentRoom && (
-        <header className="chatHeader" onClick={() => openGroupDesc(true)}>
-          <Avatar src={currentRoom.group_icon} />
-          <div className="chatHeaderData">
+        <header className="chatHeader" >
+          <Avatar src={currentRoom.group_icon} onClick={() => openGroupDesc(true)}/>
+          <div className="chatHeaderData" onClick={() => openGroupDesc(true)}>
             <div>
             <h3>{currentRoom.name}</h3>
             <span className={groupDescStatus ? "chatUsers1" : "chatUsers"}>

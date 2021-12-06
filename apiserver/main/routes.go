@@ -23,6 +23,7 @@ func routes() http.Handler {
 	mux.Post("/room/create", handler.Repo.CreateRoom)
 	mux.Post("/room/details", handler.Repo.RoomDetails)
 	mux.Post("/room/join", handler.Repo.JoinRoom)
+	mux.Post("/room/search", handler.Repo.SearchRoom)
 	mux.Post("/room/update", handler.Repo.UpdateRoom)
 	mux.Post("/room/leave", handler.Repo.LeaveRoom)
 	mux.Post("/message/send", handler.Repo.SendMessage)
