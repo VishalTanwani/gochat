@@ -1,0 +1,99 @@
+.story{
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+.story-cross > .MuiSvgIcon-root {
+    padding: 10px;
+    color: white;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.story-set > .MuiSvgIcon-root {
+    padding: 10px;
+    color: white;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.story-body {
+    height: 100vh;
+    width: 33vw;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    align-items: center;
+}
+
+.user-story {
+    display: flex;
+    position: absolute;
+    width: 38vw;
+    align-items: center;
+    top: 50px;
+}
+.user-story-name > h1 {
+    font-size: 16px;
+    margin-left: 20px;
+    color: white;
+    text-transform: capitalize;
+}
+.story-body > p {
+    text-align: center;
+    color: white;
+    padding: 10px;
+}
+
+.story-body > textarea {
+    outline: 0px;
+    border: 0px;
+    color: white;
+    border: 0;
+    font-family: sans-serif;
+    height: 100%;
+    width: 38vw;
+}
+
+.story-body > textarea::placeholder {
+    color: white;
+}
+
+.story-slider{
+    width: 38vw;
+    overflow: hidden;
+    position: absolute;
+    top: 20px;
+}
+
+.story-status-slider1 {
+    background-color: #ffffff4e;
+    width: 38vw;
+    overflow: hidden;
+    border-radius: 100px;
+    position: relative;
+    height: 10px;
+}
+@keyframes shilfleft {
+    0% {transform: translateX(0%);}
+    25% {transform: translateX(25%);}
+    50% {transform: translateX(50%);}
+    100% {transform: translateX(100%);}
+}
+.story-status-slider2 {
+    background-color: #ffffff;
+    width: 38vw;
+    border-radius: 100px;
+    height: 10px;
+    position: absolute;
+    left:-100%;
+    animation: shilfleft 10s linear;
+}

@@ -2,13 +2,12 @@ import "./sidebar.css";
 import React, { useContext, useEffect, useState } from "react";
 import { Avatar, IconButton, Menu, MenuItem } from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge";
-import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import SearchOutlinedIcon from "@material-ui/icons/SearchOutlined";
 import Conversation from "./Conversation";
 import { StateContext } from "../context/StateProvider";
 
-function SideBar() {
+function SideBar(props) {
   const {
     getProfile,
     user,
@@ -18,12 +17,13 @@ function SideBar() {
     currentRoom,
     searchRoom,
     searchRooms,
-    logout
+    logout,
+    openStory
   } = useContext(StateContext);
+
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(false)
   const open = Boolean(anchorEl);
-
   useEffect(() => {
     async function fetchData() {
       window.localStorage["token"] && (await getProfile());
@@ -59,11 +59,8 @@ function SideBar() {
         <>
           <Avatar src={user && user.profile_image} onClick={profileClick} />
           <div className="otherIcons">
-            <IconButton>
+            <IconButton onClick={() => {openStory(true); props.history.replace("/story")}}>
               <DonutLargeIcon />
-            </IconButton>
-            <IconButton>
-              <ChatIcon />
             </IconButton>
             <IconButton onClick={handleClick}>
               <MoreVertIcon />

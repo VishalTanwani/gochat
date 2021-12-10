@@ -13,8 +13,8 @@ function Container(props) {
     }, [props])
   return (
     <>
-      <SideBar />
-      {currentRoom ? <Chat /> : <SelectRoom/>}
+      <SideBar history={props.history}/>
+      {currentRoom ? <Chat history={props.history}/> : <SelectRoom/>}
     </>
   );
 }

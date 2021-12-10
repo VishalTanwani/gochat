@@ -19,4 +19,6 @@ type DatabaseRepo interface {
 	GetUserRooms(email string) ([]models.Room, error)
 	SendMessage(message models.MessageWithToken) (string, error)
 	GetMessagesByRoom(room string) ([]models.Message, error)
+	CreateStory(id string, userStory models.UserStory) (string, error)
+	GetStory(id string) (models.UserStory, error)
 }

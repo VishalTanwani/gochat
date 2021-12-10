@@ -75,3 +75,13 @@ type MessageWithToken struct {
 	Room      string             `json:"room,omitempty" bson:"room,omitempty"`
 	CreatedAt int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
 }
+
+//UserStory is story model
+type UserStory struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	UserID    primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Body string `json:"body,omitempty" bson:"body,omitempty"`
+	Token     string             `json:"token,omitempty" bson:"token,omitempty"`
+	CreatedAt primitive.DateTime              `json:"create_at,omitempty" bson:"create_at,omitempty"`
+	ExpireOn primitive.DateTime              `json:"expire_on,omitempty" bson:"expire_on,omitempty"`
+}

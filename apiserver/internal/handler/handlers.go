@@ -672,6 +672,89 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//CreateStoryForUser will create a story for a user
+func (m *Repository) CreateStoryForUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.UserStory
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decodeing token")
+			helpers.ServerError(w, err)
+			return
+		}
+		temp.Token = ""
+		res, err := m.DB.CreateStory(fmt.Sprint(mapData["_id"]), temp)
+		if err == nil {
+			json.NewEncoder(w).Encode(res)
+		} else {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "can not set story" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//GetStoryForUser will give a user
+func (m *Repository) GetStoryForUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.UserStory
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		mapData, err := tokenDecode(temp.Token)
+		if err != nil {
+			m.App.ErrorLog.Println("error at decodeing token")
+			helpers.ServerError(w, err)
+			return
+		}
+		res, err := m.DB.GetStory(fmt.Sprint(mapData["_id"]))
+		if err == nil {
+			json.NewEncoder(w).Encode(res)
+		} else {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"meesage": "can not get story" }`))
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
 func generateJWTToken(user models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claim := token.Claims.(jwt.MapClaims)

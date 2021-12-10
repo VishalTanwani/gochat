@@ -16,6 +16,8 @@ export const StateProvider = ({ children }) => {
     messages: state.messages,
     groupDescStatus: state.groupDescStatus,
     searchRooms: state.searchRooms,
+    userStory: state.userStory,
+    storyStatus: state.storyStatus,
     unifiedRegister: (email) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
@@ -293,6 +295,57 @@ export const StateProvider = ({ children }) => {
     logout: () => {
       window.localStorage.clear()
       window.location.href = "/login"
+    },
+    setStory: (body) => {
+      axios
+        .post(process.env.REACT_APP_API_ENDPOINT + "/story/create", {
+          "Content-Type": "application/json",
+          token: window.localStorage["token"],
+          body: body
+        })
+        .then(function (response) {
+          dispatch({
+            type: actionTypes.SET_STORY,
+            payload: response.data,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          dispatch({
+            type: actionTypes.TRANSACTION_ERROR,
+            status: true,
+            message: "Network error",
+          });
+        });
+        window.location.href = "/whatsapp"
+
+    },
+    getStory: () => {
+      axios
+        .post(process.env.REACT_APP_API_ENDPOINT + "/story/get", {
+          "Content-Type": "application/json",
+          token: window.localStorage["token"],
+        })
+        .then(function (response) {
+          dispatch({
+            type: actionTypes.SET_STORY,
+            payload: response.data,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          dispatch({
+            type: actionTypes.TRANSACTION_ERROR,
+            status: true,
+            message: "Network error",
+          });
+        });
+    },
+    openStory: (status) => {
+      dispatch({
+        type: actionTypes.OPEN_STORY,
+        payload: status
+      })
     }
   };
   return (

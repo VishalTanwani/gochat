@@ -6,6 +6,8 @@ import (
 	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
 )
@@ -186,6 +188,7 @@ func (m *mongoDBRepo) UpdateRoom(room models.Room) (string, error) {
 	return "", nil
 }
 
+//SendMessage will send a message to db
 func (m *mongoDBRepo) SendMessage(message models.MessageWithToken) (string, error) {
 	collection := m.DB.Database("gochat").Collection("messages")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -197,6 +200,7 @@ func (m *mongoDBRepo) SendMessage(message models.MessageWithToken) (string, erro
 	return "Message sent", nil
 }
 
+//GetMessagesByRoom will give all messages of rooms
 func (m *mongoDBRepo) GetMessagesByRoom(id string) ([]models.Message, error) {
 	collection := m.DB.Database("gochat").Collection("messages")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -221,6 +225,53 @@ func (m *mongoDBRepo) GetMessagesByRoom(id string) ([]models.Message, error) {
 	}
 	return messages, nil
 	
+}
+
+//CreateStory will store story in db with index of a ttl
+func (m *mongoDBRepo) CreateStory(id string, userStory models.UserStory) (string, error) {
+	collection := m.DB.Database("gochat").Collection("story")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	userID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return "", err
+	}
+	userStory.CreatedAt = primitive.NewDateTimeFromTime( time.Now() )
+	userStory.ExpireOn = primitive.NewDateTimeFromTime( time.Now().Add(time.Hour) )
+	userStory.UserID = userID
+	index := mongo.IndexModel{
+		Keys:    bson.M{"create_at":1},
+		Options: options.Index().SetExpireAfterSeconds(3600),
+	}
+	test, err := collection.Indexes().CreateOne(ctx, index)
+	fmt.Println(index, test)
+	if err != nil {
+		return "", err
+	}
+	_, err = collection.InsertOne(ctx, userStory)
+	if err != nil {
+		return "", err
+	}
+	return "story set", nil
+
+}
+
+//GetStory will give of a user
+func (m *mongoDBRepo) GetStory(id string) (models.UserStory, error) {
+	collection := m.DB.Database("gochat").Collection("story")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var uStory models.UserStory
+	userID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return uStory, err
+	}
+	err = collection.FindOne(ctx, models.UserStory{UserID: userID}).Decode(&uStory)
+	if err != nil {
+		return uStory, err
+	}
+	return uStory, nil
+
 }
 
 func primtiveObjToString(id interface{}) string {
