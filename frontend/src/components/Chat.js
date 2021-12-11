@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import aes256 from "aes256"
 import SendIcon from "@material-ui/icons/Send";
 import "./chat.css";
 import { Avatar, IconButton } from "@material-ui/core";
@@ -47,7 +48,9 @@ const Chat = () => {
     };
 
     socket.onmessage = (msg) => {
-      setChats([...chats, JSON.parse(msg.data)]);
+      msg = JSON.parse(msg.data)
+      msg.body = aes256.decrypt(currentRoom._id,msg.body)
+      setChats([...chats, msg]);
     };
 
     socket.onerror = (err) => {
@@ -60,7 +63,7 @@ const Chat = () => {
     if (message.length !== 0) {
       await socket.send(
         JSON.stringify({
-          body: message,
+          body: aes256.encrypt(currentRoom._id,message),
           user_id: user._id,
           user_name: user.name,
           type: "message",
@@ -139,7 +142,7 @@ const Chat = () => {
                     data.user_id === user._id && "chatSender"
                   }`}
                 >
-                  <p>{data.user_name}</p>
+                  {data.user_id !== user._id && <p>{data.user_name}</p>}
                   <p className="dataMessage">{data.body}</p>
                   <div className="chatTimeStamp">
                     {new Date(
