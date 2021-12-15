@@ -4,7 +4,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { StateContext } from "../context/StateProvider"
 
 function Alert() {
-    const { alertStatus, alertMessage, closeAlert } = useContext(StateContext)
+    const { alertStatus, alertMessage, closeAlert, alertSeverity } = useContext(StateContext)
+
     const handleClose = () => {
         closeAlert(false,"")
     }
@@ -12,7 +13,7 @@ function Alert() {
     let horizontal = "right"
     return (
         <Snackbar open={alertStatus} anchorOrigin={{ vertical, horizontal }} autoHideDuration={5000} onClose={handleClose}>
-            <MuiAlert onClose={handleClose} severity="error" style={{ width: "100%" }}>
+            <MuiAlert onClose={handleClose} severity={alertSeverity} style={{ width: "100%" }}>
                 { alertMessage }
             </MuiAlert>
         </Snackbar>

@@ -13,9 +13,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"math/rand"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
-	"sort"
 )
 
 //Repository is repository type
@@ -574,7 +574,7 @@ func (m *Repository) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if check {
-		room,err := m.DB.GetRoomByID(primtiveObjToString(temp.RoomID))
+		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.RoomID))
 		if err == nil {
 			mapData, err := tokenDecode(temp.Token)
 			if err != nil {
@@ -583,8 +583,8 @@ func (m *Repository) SendMessage(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			if temp.Type == "joinRoom" {
-				for _,v := range room.Users {
-					if v == fmt.Sprint(mapData["email"]){
+				for _, v := range room.Users {
+					if v == fmt.Sprint(mapData["email"]) {
 						return
 					}
 				}
@@ -633,18 +633,18 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	if check {
 		mapData, err := tokenDecode(temp.Token)
-			if err != nil {
-				m.App.ErrorLog.Println("error at decoding token")
-				helpers.ServerError(w, err)
-				return
-			}
+		if err != nil {
+			m.App.ErrorLog.Println("error at decoding token")
+			helpers.ServerError(w, err)
+			return
+		}
 		room, err := m.DB.GetRoomByID(primtiveObjToString(temp.ID))
-		if err == nil{
-			for _,v := range room.Users {
+		if err == nil {
+			for _, v := range room.Users {
 				if v == fmt.Sprint(mapData["email"]) {
-					messages,err := m.DB.GetMessagesByRoom(primtiveObjToString(temp.ID))
+					messages, err := m.DB.GetMessagesByRoom(primtiveObjToString(temp.ID))
 					if err == nil {
-						sort.Slice(messages, func(i,j int) bool {
+						sort.Slice(messages, func(i, j int) bool {
 							return messages[i].CreatedAt < messages[j].CreatedAt
 						})
 						json.NewEncoder(w).Encode(messages)
@@ -664,7 +664,7 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(`{"meesage": "cannot find room" }`))
 			return
 		}
-		
+
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"meesage": "token invalidation" }`))

@@ -49,7 +49,8 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 alertStatus: action.status,
-                alertMessage: action.message
+                alertMessage: action.message,
+                alertSeverity: action.severity
             }
         case "PROFILE_OPNER":
             return {

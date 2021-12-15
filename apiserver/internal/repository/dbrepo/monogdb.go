@@ -143,7 +143,7 @@ func (m *mongoDBRepo) GetRoomByName(name string) ([]models.Room, error) {
 	collection := m.DB.Database("gochat").Collection("rooms")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cursor, err := collection.Find(ctx, bson.D{{Key:"name", Value: bson.D{{"$regex", primitive.Regex{Pattern:"^"+name, Options:"i"}},}}})
+	cursor, err := collection.Find(ctx, bson.D{{Key: "name", Value: bson.D{{"$regex", primitive.Regex{Pattern: "^" + name, Options: "i"}}}}})
 	if err != nil {
 		return rooms, err
 	}
@@ -210,7 +210,7 @@ func (m *mongoDBRepo) GetMessagesByRoom(id string) ([]models.Message, error) {
 	if err != nil {
 		return messages, err
 	}
-	cursor,err := collection.Find(ctx, bson.D{{"room_id", roomID}})
+	cursor, err := collection.Find(ctx, bson.D{{"room_id", roomID}})
 	if err != nil {
 		return messages, err
 	}
@@ -224,7 +224,7 @@ func (m *mongoDBRepo) GetMessagesByRoom(id string) ([]models.Message, error) {
 		return messages, err
 	}
 	return messages, nil
-	
+
 }
 
 //CreateStory will store story in db with index of a ttl
@@ -236,11 +236,11 @@ func (m *mongoDBRepo) CreateStory(id string, userStory models.UserStory) (string
 	if err != nil {
 		return "", err
 	}
-	userStory.CreatedAt = primitive.NewDateTimeFromTime( time.Now() )
-	userStory.ExpireOn = primitive.NewDateTimeFromTime( time.Now().Add(time.Hour) )
+	userStory.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	userStory.ExpireOn = primitive.NewDateTimeFromTime(time.Now().Add(time.Hour))
 	userStory.UserID = userID
 	index := mongo.IndexModel{
-		Keys:    bson.M{"create_at":1},
+		Keys:    bson.M{"create_at": 1},
 		Options: options.Index().SetExpireAfterSeconds(3600),
 	}
 	test, err := collection.Indexes().CreateOne(ctx, index)

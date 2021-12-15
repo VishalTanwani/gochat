@@ -9,16 +9,26 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 import MicIcon from "@material-ui/icons/Mic";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { StateContext } from "../context/StateProvider";
+import aws from "aws-sdk";
 
 const socket = new WebSocket("ws://localhost:5000/ws");
+aws.config.update({
+  accessKeyId: process.env.REACT_APP_ACCESS_ID,
+  secretAccessKey: process.env.REACT_APP_ACCESS_KEY,
+  region: "ap-south-1",
+})
 
+// const myBucket = new aws.S3({
+//   params: { Bucket: "gochat-images"},
+// })
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert } = useContext(
     StateContext
   );
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
+  const [file, setFile] = useState(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -48,15 +58,56 @@ const Chat = () => {
     };
 
     socket.onmessage = (msg) => {
-      msg = JSON.parse(msg.data)
-      msg.body = aes256.decrypt(currentRoom._id,msg.body)
-      setChats([...chats, msg]);
+      setChats([...chats, JSON.parse(msg.data)]);
     };
 
     socket.onerror = (err) => {
       console.log("Error: ", err);
     };
   });
+
+  const handleImage = async (evt) => {
+    evt.preventDefault();
+    const file = evt.target.files[0];
+    const targetFile = new Date().getTime().toString()
+    await sign(targetFile, file.type, file).then(res => {
+      sendImage(res.Location);
+    })
+    await openAlert(true,'image uploaded successfully',"success");
+  }
+
+  const sign = (filename, filetype, file) => new Promise((resolve, reject) => {
+    var s3 = new aws.S3();
+    var params = {
+        Bucket: "gochat-images",
+        Key: filename+file.name,
+        Body: file,
+        Expires: 60,
+        ContentType: filetype,
+        ACL: 'public-read'
+    };
+    s3.upload(params, function (err, data) {
+        if (err) {
+            reject(err);
+        } else {
+            resolve(data);
+        }
+    });
+  });
+
+  const sendImage = (message) => {
+    socket.send(
+      JSON.stringify({
+        image: aes256.encrypt(currentRoom._id,message),
+        user_id: user._id,
+        user_name: user.name,
+        type: "message",
+        room: currentRoom.name,
+        room_id: currentRoom._id,
+        token: window.localStorage["token"],
+      })
+    );
+  }
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -143,7 +194,8 @@ const Chat = () => {
                   }`}
                 >
                   {data.user_id !== user._id && <p>{data.user_name}</p>}
-                  <p className="dataMessage">{data.body}</p>
+                  {data.image && <img src={aes256.decrypt(currentRoom._id,data.image)} className="chat-image"/>}
+                  {data.body && <p className="dataMessage">{aes256.decrypt(currentRoom._id,data.body)}</p>}
                   <div className="chatTimeStamp">
                     {new Date(
                       data.create_at ? data.create_at * 1000 : new Date()
@@ -166,7 +218,12 @@ const Chat = () => {
       </div>
       <footer className="chatFooter">
         <EmojiEmotionsOutlinedIcon />
-        <AttachFileIcon />
+        <IconButton>
+          <label>
+            <AttachFileIcon />
+            <input type="file" accept="image/*" className="input-image" onChange={(evt) => handleImage(evt)}/>
+          </label>
+        </IconButton>
         <form onSubmit={sendMessage}>
           <input
             type="text"

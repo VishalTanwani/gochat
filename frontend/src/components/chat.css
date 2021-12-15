@@ -134,3 +134,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.input-image {
+    display: none;
+}
+.chat-image{
+    object-fit: cover;
+    width: 200px;
+    height: 200px;
+}

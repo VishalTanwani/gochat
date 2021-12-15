@@ -45,7 +45,7 @@ function Profile() {
       token: window.localStorage["token"],
     });
     socketFunctions.sendMessage({
-      body: user.name + "<check> changed group name to " + name,
+      body: user.name + "<check> changed group name from to " + name,
       user_id: user._id,
       user_name: user.name,
       type: "info",

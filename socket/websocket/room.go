@@ -6,7 +6,7 @@ import (
 
 //Room struct
 type Room struct {
-	ID string
+	ID         string
 	Name       string
 	Register   chan *Client
 	UnRegister chan *Client
@@ -17,7 +17,7 @@ type Room struct {
 //NewRoom is for creatng new pool
 func NewRoom(id string) *Room {
 	return &Room{
-		ID:       id,
+		ID:         id,
 		Register:   make(chan *Client),
 		UnRegister: make(chan *Client),
 		Clients:    make(map[*Client]bool),

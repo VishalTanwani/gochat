@@ -1,0 +1,11 @@
+.image-viewer{
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    flex: 0.70;
+    width: 70%;
+    height: 100vh;
+    background-color: black;
+    z-index: 1;
+    overflow-y: scroll;
+}

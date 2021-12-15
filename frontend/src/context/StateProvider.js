@@ -39,6 +39,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
     },
@@ -60,6 +61,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error",
           });
         });
     },
@@ -81,6 +83,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
     },
@@ -104,14 +107,24 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
+    },
+    openAlert: (status, message, severity) => {
+      dispatch({
+        type: actionTypes.TRANSACTION_ERROR,
+        status: status,
+        message: message,
+        severity: severity
+      });
     },
     closeAlert: (status, message) => {
       dispatch({
         type: actionTypes.TRANSACTION_ERROR,
         status: status,
         message: message,
+        severity: "error"
       });
     },
     openProfile: (status) => {
@@ -145,6 +158,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
     },
@@ -166,6 +180,7 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
+          severity: "error"
         });
       });
       
@@ -189,6 +204,7 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
+          severity: "error"
         });
       });
       
@@ -212,6 +228,7 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
+          severity: "error"
         });
       });
     },
@@ -236,6 +253,7 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
+          severity: "error"
         });
       });
     },
@@ -258,6 +276,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
     },
@@ -282,6 +301,7 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
+          severity: "error"
         });
       });
     },
@@ -290,6 +310,7 @@ export const StateProvider = ({ children }) => {
         type: actionTypes.TRANSACTION_ERROR,
         status: true,
         message: "Network error",
+        severity: "error"
       });
     },
     logout: () => {
@@ -307,6 +328,7 @@ export const StateProvider = ({ children }) => {
           dispatch({
             type: actionTypes.SET_STORY,
             payload: response.data,
+            severity: "error"
           });
         })
         .catch(function (error) {
@@ -315,6 +337,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
         window.location.href = "/whatsapp"
@@ -338,6 +361,7 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
+            severity: "error"
           });
         });
     },
