@@ -16,3 +16,4 @@
 
 # dependencies
 frontend/node_modules
+frontend/development.env
