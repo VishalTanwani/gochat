@@ -12,11 +12,6 @@ import { StateContext } from "../context/StateProvider";
 import aws from "aws-sdk";
 
 const socket = new WebSocket("ws://localhost:5000/ws");
-aws.config.update({
-  accessKeyId: process.env.REACT_APP_ACCESS_ID,
-  secretAccessKey: process.env.REACT_APP_ACCESS_KEY,
-  region: "ap-south-1",
-})
 
 // const myBucket = new aws.S3({
 //   params: { Bucket: "gochat-images"},
@@ -29,6 +24,14 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    aws.config.update({
+      accessKeyId: process.env.REACT_APP_ACCESS_ID,
+      secretAccessKey: process.env.REACT_APP_ACCESS_KEY,
+      region: "ap-south-1",
+    })    
+  }, [])
 
   useEffect(() => {
     async function fetchData() {
