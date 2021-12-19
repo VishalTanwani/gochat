@@ -19,6 +19,7 @@ func routes() http.Handler {
 	mux.Post("/user/register", handler.Repo.RegisterUser)
 	mux.Post("/user/profile", handler.Repo.GetUserProfile)
 	mux.Post("/user/rooms", handler.Repo.UserRooms)
+	mux.Post("/user/get", handler.Repo.GetUserByID)
 	mux.Post("/user/update", handler.Repo.UpdateUser)
 	mux.Post("/room/create", handler.Repo.CreateRoom)
 	mux.Post("/room/details", handler.Repo.RoomDetails)

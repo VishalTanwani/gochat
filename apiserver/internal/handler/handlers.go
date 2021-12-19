@@ -482,6 +482,27 @@ func (m *Repository) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//GetUserByID will give user profile
+func (m *Repository) GetUserByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.User
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	
+	user, err := m.DB.GetUserByID(primtiveObjToString(temp.ID))
+		if err == nil {
+			json.NewEncoder(w).Encode(user)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot find user" }`))
+			return
+		}
+}
+
 //UserRooms will give users room
 func (m *Repository) UserRooms(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")

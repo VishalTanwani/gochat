@@ -8,6 +8,8 @@ export const initialState = {
     alertMessage: null,
     profileStatue: null,
     storyStatus: null,
+    imageViewerStatus: null,
+    image:  null,
     groupDescStatus: null,
     messages: [],
 }
@@ -25,7 +27,8 @@ export const actionTypes = {
     GROUP_DESC_OPENER: "GROUP_DESC_OPENER",
     SEARCH_ROOM: "SEARCH_ROOM",
     SET_STORY: "SET_STORY",
-    OPEN_STORY: "OPEN_STORY"
+    OPEN_STORY: "OPEN_STORY",
+    OPEN_IMAGE_VIEWER: "OPEN_IMAGE_VIEWER"
 }
 
 const reducer = (state, action) => {
@@ -50,7 +53,6 @@ const reducer = (state, action) => {
                 ...state,
                 alertStatus: action.status,
                 alertMessage: action.message,
-                alertSeverity: action.severity
             }
         case "PROFILE_OPNER":
             return {
@@ -97,6 +99,12 @@ const reducer = (state, action) => {
             return{
                 ...state,
                 storyStatus: action.payload
+            }
+        case "OPEN_IMAGE_VIEWER":
+            return{
+                ...state,
+                imageViewerStatus: action.payload.status,
+                image: action.payload.image
             }
         default:
             return state;

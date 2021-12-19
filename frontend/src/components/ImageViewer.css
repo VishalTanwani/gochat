@@ -2,10 +2,44 @@
     display: flex;
     position: absolute;
     flex-direction: column;
-    flex: 0.70;
-    width: 70%;
+    width: 100%;
     height: 100vh;
-    background-color: black;
+    background-color: #ffffffe0;
     z-index: 1;
-    overflow-y: scroll;
+    box-sizing: border-box;
+    padding: 10px;
+}
+.image-viewer-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+.image-viewer-header-user{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.image-viewer-header-user > div {
+    margin-left: 20px;
+}
+.image-viewer-header-user > div > p {
+    font-size: 16px;
+}
+.image-viewer-header-user > div > span {
+    font-size: 14px;
+    color: gray;
+}
+.image-viewer-cross {
+    color: black;
+}
+.image-viewer-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.image-viewer-body > img {
+    width: auto;
+    height: 50vh;
 }

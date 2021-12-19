@@ -6,6 +6,7 @@ import Alert from "./components/Alert";
 import Profile from "./components/Profile";
 import GroupDesc from "./components/GroupDesc";
 import { socketFunctions } from "./components/socket"
+import ImageViewer from "./components/ImageViewer";
 
 function App() {
   socketFunctions.initialize()
@@ -17,6 +18,7 @@ function App() {
           <Routes />
           <Alert />
           <GroupDesc/>
+          <ImageViewer/>
         </StateProvider>
       </div>
     </div>

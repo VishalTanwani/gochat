@@ -18,6 +18,8 @@ export const StateProvider = ({ children }) => {
     searchRooms: state.searchRooms,
     userStory: state.userStory,
     storyStatus: state.storyStatus,
+    imageViewerStatus: state.imageViewerStatus,
+    image: state.image,
     unifiedRegister: (email) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
@@ -39,7 +41,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
@@ -61,7 +62,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error",
           });
         });
     },
@@ -83,7 +83,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
@@ -107,16 +106,14 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
-    openAlert: (status, message, severity) => {
+    openAlert: (status, message) => {
       dispatch({
         type: actionTypes.TRANSACTION_ERROR,
         status: status,
         message: message,
-        severity: severity
       });
     },
     closeAlert: (status, message) => {
@@ -124,7 +121,6 @@ export const StateProvider = ({ children }) => {
         type: actionTypes.TRANSACTION_ERROR,
         status: status,
         message: message,
-        severity: "error"
       });
     },
     openProfile: (status) => {
@@ -158,7 +154,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
@@ -180,7 +175,6 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
-          severity: "error"
         });
       });
       
@@ -204,7 +198,6 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
-          severity: "error"
         });
       });
       
@@ -228,7 +221,6 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
-          severity: "error"
         });
       });
     },
@@ -253,7 +245,6 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
-          severity: "error"
         });
       });
     },
@@ -276,7 +267,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
@@ -301,7 +291,6 @@ export const StateProvider = ({ children }) => {
           type: actionTypes.TRANSACTION_ERROR,
           status: true,
           message: "Network error",
-          severity: "error"
         });
       });
     },
@@ -310,7 +299,6 @@ export const StateProvider = ({ children }) => {
         type: actionTypes.TRANSACTION_ERROR,
         status: true,
         message: "Network error",
-        severity: "error"
       });
     },
     logout: () => {
@@ -328,7 +316,6 @@ export const StateProvider = ({ children }) => {
           dispatch({
             type: actionTypes.SET_STORY,
             payload: response.data,
-            severity: "error"
           });
         })
         .catch(function (error) {
@@ -337,7 +324,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
         window.location.href = "/whatsapp"
@@ -361,7 +347,6 @@ export const StateProvider = ({ children }) => {
             type: actionTypes.TRANSACTION_ERROR,
             status: true,
             message: "Network error",
-            severity: "error"
           });
         });
     },
@@ -369,6 +354,12 @@ export const StateProvider = ({ children }) => {
       dispatch({
         type: actionTypes.OPEN_STORY,
         payload: status
+      })
+    },
+    imageViewer: (status, image) => {
+      dispatch({
+        type: actionTypes.OPEN_IMAGE_VIEWER,
+        payload: {status, image}
       })
     }
   };

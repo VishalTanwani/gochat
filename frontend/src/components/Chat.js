@@ -13,17 +13,13 @@ import aws from "aws-sdk";
 
 const socket = new WebSocket("ws://localhost:5000/ws");
 
-// const myBucket = new aws.S3({
-//   params: { Bucket: "gochat-images"},
-// })
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert, imageViewer } = useContext(
     StateContext
   );
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
-  const [file, setFile] = useState(null)
 
   useEffect(() => {
     aws.config.update({
@@ -197,7 +193,7 @@ const Chat = () => {
                   }`}
                 >
                   {data.user_id !== user._id && <p>{data.user_name}</p>}
-                  {data.image && <img src={aes256.decrypt(currentRoom._id,data.image)} className="chat-image"/>}
+                  {data.image && <img onClick={() => imageViewer(true, data)} src={aes256.decrypt(currentRoom._id,data.image)} alt={data._id} className="chat-image"/>}
                   {data.body && <p className="dataMessage">{aes256.decrypt(currentRoom._id,data.body)}</p>}
                   <div className="chatTimeStamp">
                     {new Date(
