@@ -58,7 +58,7 @@ type Message struct {
 	RoomID    primitive.ObjectID `json:"room_id,omitempty" bson:"room_id,omitempty"`
 	UserName  string             `json:"user_name" bson:"user_name"`
 	Body      string             `json:"body" bson:"body"`
-	Image      string             `json:"image" bson:"image"`
+	Image     string             `json:"image" bson:"image"`
 	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
 	Room      string             `json:"room" bson:"room"`
 	CreatedAt int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`
@@ -72,7 +72,7 @@ type MessageWithToken struct {
 	Token     string             `json:"token,omitempty" bson:"token,omitempty"`
 	UserName  string             `json:"user_name,omitempty" bson:"user_name,omitempty"`
 	Body      string             `json:"body,omitempty" bson:"body,omitempty"`
-	Image      string             `json:"image" bson:"image"`
+	Image     string             `json:"image" bson:"image"`
 	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
 	Room      string             `json:"room,omitempty" bson:"room,omitempty"`
 	CreatedAt int64              `json:"create_at,omitempty" bson:"create_at,omitempty"`

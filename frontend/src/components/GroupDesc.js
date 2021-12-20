@@ -7,6 +7,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import CreateIcon from "@material-ui/icons/Create";
 import DoneIcon from "@material-ui/icons/Done";
 import { socketFunctions } from "./socket";
+import aes256 from "aes256"
 
 function Profile() {
   const {
@@ -36,7 +37,7 @@ function Profile() {
   const onNameSubmit = async () => {
     await updateRoom(name, about);
     socketFunctions.sendMessage({
-      body: user && user.name + "<check> joined",
+      body: aes256.encrypt(currentRoom && currentRoom._id, user && user.name + "<check> joined"),
       user_id: user && user._id,
       user_name: user && user.name,
       type: "joinRoom",
@@ -45,7 +46,7 @@ function Profile() {
       token: window.localStorage["token"],
     });
     socketFunctions.sendMessage({
-      body: user.name + "<check> changed group name from to " + name,
+      body: aes256.encrypt(currentRoom && currentRoom._id, user.name + "<check> changed group name to " + name),
       user_id: user._id,
       user_name: user.name,
       type: "info",
@@ -59,7 +60,7 @@ function Profile() {
   const onAboutSubmit = async () => {
     await updateRoom(name, about);
     socketFunctions.sendMessage({
-      body: user && user.name + "<check> joined",
+      body: aes256.encrypt(currentRoom && currentRoom._id, user && user.name + "<check> joined"),
       user_id: user && user._id,
       user_name: user && user.name,
       type: "joinRoom",
@@ -68,7 +69,7 @@ function Profile() {
       token: window.localStorage["token"],
     });
     socketFunctions.sendMessage({
-      body: user.name + "<check> changed group description to " + about,
+      body: aes256.encrypt(currentRoom && currentRoom._id, user.name + "<check> changed group description to " + about),
       user_id: user._id,
       user_name: user.name,
       type: "info",

@@ -492,15 +492,15 @@ func (m *Repository) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
-	
+
 	user, err := m.DB.GetUserByID(primtiveObjToString(temp.ID))
-		if err == nil {
-			json.NewEncoder(w).Encode(user)
-		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"meesage": "cannot find user" }`))
-			return
-		}
+	if err == nil {
+		json.NewEncoder(w).Encode(user)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "cannot find user" }`))
+		return
+	}
 }
 
 //UserRooms will give users room
@@ -685,6 +685,40 @@ func (m *Repository) GetMessagesByRoom(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(`{"meesage": "cannot find room" }`))
 			return
 		}
+
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+}
+
+//GetLastMessagesOfRoom will give last messages of room
+func (m *Repository) GetLastMessagesOfRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	var temp models.MessageWithToken
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		m.App.ErrorLog.Println("error at decoding body")
+		helpers.ServerError(w, err)
+		return
+	}
+	check, err := verifyToken(temp.Token)
+	if err != nil {
+		m.App.ErrorLog.Println("error at verifing token")
+		helpers.ServerError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "token invalidation" }`))
+		return
+	}
+	if check {
+		message, err := m.DB.GetLastMeessage(primtiveObjToString(temp.RoomID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"meesage": "cannot get last message" }`))
+			return
+		}
+		json.NewEncoder(w).Encode(message)
 
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)

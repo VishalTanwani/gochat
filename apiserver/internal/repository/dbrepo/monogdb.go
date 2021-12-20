@@ -274,6 +274,25 @@ func (m *mongoDBRepo) GetStory(id string) (models.UserStory, error) {
 
 }
 
+//GetLastMeessage will give the last message
+func (m *mongoDBRepo) GetLastMeessage(id string) (models.Message, error) {
+	var message models.Message
+	collection := m.DB.Database("gochat").Collection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	roomID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return message, err
+	}
+	findOprions := options.FindOne()
+	findOprions.SetSort(bson.D{{"_id", -1}})
+	err = collection.FindOne(ctx, bson.D{{"room_id", roomID}}, findOprions).Decode(&message)
+	if err != nil {
+		return message, err
+	}
+	return message, nil
+}
+
 func primtiveObjToString(id interface{}) string {
 	ID := fmt.Sprintf("%s", id)
 	return strings.Split(ID, "\"")[1]

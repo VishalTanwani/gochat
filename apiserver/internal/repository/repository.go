@@ -21,4 +21,5 @@ type DatabaseRepo interface {
 	GetMessagesByRoom(room string) ([]models.Message, error)
 	CreateStory(id string, userStory models.UserStory) (string, error)
 	GetStory(id string) (models.UserStory, error)
+	GetLastMeessage(id string) (models.Message, error)
 }

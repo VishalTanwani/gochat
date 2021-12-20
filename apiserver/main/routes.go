@@ -29,6 +29,7 @@ func routes() http.Handler {
 	mux.Post("/room/leave", handler.Repo.LeaveRoom)
 	mux.Post("/message/send", handler.Repo.SendMessage)
 	mux.Post("/message/get", handler.Repo.GetMessagesByRoom)
+	mux.Post("/message/getLastMessage", handler.Repo.GetLastMessagesOfRoom)
 	mux.Post("/story/create", handler.Repo.CreateStoryForUser)
 	mux.Post("/story/get", handler.Repo.GetStoryForUser)
 	return mux

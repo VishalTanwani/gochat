@@ -208,9 +208,9 @@ const Chat = () => {
               ) : (
                 <p key={i} className={`chatJoinOrLeft`}>
                   {data.user_id === user._id
-                    ? "you" + data.body.split("<check>")[1]
-                    : data.body.split("<check>")[0] +
-                      data.body.split("<check>")[1]}
+                    ? "you" + aes256.decrypt(currentRoom._id,data.body).split("<check>")[1]
+                    : aes256.decrypt(currentRoom._id,data.body).split("<check>")[0] +
+                      aes256.decrypt(currentRoom._id,data.body).split("<check>")[1]}
                 </p>
               )
             )}
