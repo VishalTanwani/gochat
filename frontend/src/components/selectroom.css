@@ -20,3 +20,17 @@
     color: #00000073;
     font-weight: 500;
 }
+.select-room-images{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.select-room-images > img {
+    width: 100px;
+    height: 100px;
+}
+.select-room-images > span {
+    color: black;
+    font-size: 20px;
+    margin: 0 20px;
+}

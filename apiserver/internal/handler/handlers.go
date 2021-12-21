@@ -13,6 +13,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"math/rand"
 	"net/http"
+	"net/mail"
 	"sort"
 	"strings"
 	"time"
@@ -46,6 +47,12 @@ func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		m.App.ErrorLog.Println("error at decoding body")
 		helpers.ServerError(w, err)
+		return
+	}
+	_,err = mail.ParseAddress(user.Email)
+	if err!=nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"meesage": "email is not valid" }`))
 		return
 	}
 	u, err := m.DB.GetUserByEmail(user.Email)
@@ -757,7 +764,6 @@ func (m *Repository) CreateStoryForUser(w http.ResponseWriter, r *http.Request) 
 		if err == nil {
 			json.NewEncoder(w).Encode(res)
 		} else {
-			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`{"meesage": "can not set story" }`))
 			return
@@ -798,7 +804,6 @@ func (m *Repository) GetStoryForUser(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			json.NewEncoder(w).Encode(res)
 		} else {
-			fmt.Println(err)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"meesage": "can not get story" }`))
 			return

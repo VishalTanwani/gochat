@@ -15,7 +15,7 @@ function Conversation(props) {
   const handleClick = async () => {
     if (!data.users || !data.users.includes(user.email)) {
       await socketFunctions.sendMessage({
-        body: user && user.name + "<check> joined",
+        body: aes256.encrypt(data && data._id, user && user.name + "<check> joined"),
         user_id: user && user._id,
         user_name: user && user.name,
         type: "joinRoom",
@@ -24,7 +24,7 @@ function Conversation(props) {
         token: window.localStorage["token"],
       });
       await sendMessage({
-        body: user && user.name + "<check> joined",
+        body: aes256.encrypt(data && data._id, user && user.name + "<check> joined"),
         user_id: user && user._id,
         user_name: user && user.name,
         type: "joinRoom",
@@ -49,7 +49,7 @@ function Conversation(props) {
         .then(async function (response) {
           console.log(response)
           await socketFunctions.sendMessage({
-            body: user && user.name + "<check> create group",
+            body: aes256.encrypt(response && response.data._id, user && user.name + "<check> create group"),
             user_id: user && user._id,
             user_name: user && user.name,
             type: "createRoom",
@@ -58,7 +58,7 @@ function Conversation(props) {
             token: window.localStorage["token"],
           });
           await sendMessage({
-            body: user && user.name + "<check> create group",
+            body: aes256.encrypt(response && response.data._id, user && user.name + "<check> create group"),
             user_id: user && user._id,
             user_name: user && user.name,
             type: "createRoom",

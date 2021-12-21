@@ -18,7 +18,9 @@ function SideBar(props) {
     searchRoom,
     searchRooms,
     logout,
-    openStory
+    openStory,
+    getStory, 
+    userStory,
   } = useContext(StateContext);
 
   const [search, setSearch] = useState("");
@@ -27,6 +29,7 @@ function SideBar(props) {
   useEffect(() => {
     async function fetchData() {
       window.localStorage["token"] && (await getProfile());
+      window.localStorage["token"] && (await getStory());
       window.localStorage["token"] && (await getRooms());
     }
     fetchData();
@@ -65,6 +68,7 @@ function SideBar(props) {
             <IconButton onClick={handleClick}>
               <MoreVertIcon />
             </IconButton>
+            {userStory && userStory.body && <div className="story-indication"></div>}
             <Menu
               id="basic-menu"
               anchorEl={anchorEl}

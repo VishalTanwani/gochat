@@ -7,6 +7,7 @@ import ArrowForward from '@material-ui/icons/ArrowForward';
 function Login(props) {
     const { unifiedRegister } = useContext(StateContext)
     const [email, setEmail] = useState("")
+    const [error, setError] = useState(false)
     useEffect(() => {
         if (window && window.localStorage["token"]) {
             props.history.push("/whatsapp")
@@ -14,7 +15,7 @@ function Login(props) {
     }, [props])
     const handleClick = async (e) => {
         e.preventDefault();
-        unifiedRegister(email)
+        email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/) ? unifiedRegister(email) : setError(true)
     }
     return (
         <div className="login">
@@ -30,10 +31,11 @@ function Login(props) {
                             login
                         </button>
                     </form>
-                        <IconButton onClick={handleClick}>
-                            <ArrowForward/>
-                        </IconButton>
+                    <IconButton onClick={handleClick}>
+                        <ArrowForward/>
+                    </IconButton>
                 </div>
+                {error && <p>email address is not valid</p>}
             </div>
         </div>
     )
