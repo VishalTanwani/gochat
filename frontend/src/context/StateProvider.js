@@ -20,20 +20,29 @@ export const StateProvider = ({ children }) => {
     storyStatus: state.storyStatus,
     imageViewerStatus: state.imageViewerStatus,
     image: state.image,
-    unifiedRegister: (email) => {
+    loginMessage: state.loginMessage,
+    unifiedRegister: (email, code) => {
       axios
         .post(process.env.REACT_APP_API_ENDPOINT + "/user/register", {
           "Content-Type": "application/json",
           email: email,
+          code: code
         })
         .then(function (response) {
           console.log(response)
-          window.localStorage["token"] = response.data.token;
-          dispatch({
-            type: actionTypes.REGISTER_LOGIN,
-            payload: response.data,
-          });
-          window.location.href = "/whatsapp"
+          if (response.data.token) {
+            window.localStorage["token"] = response.data.token;
+            dispatch({
+              type: actionTypes.REGISTER_LOGIN,
+              payload: response.data,
+            });
+            window.location.href = "/whatsapp"
+          } else {
+            dispatch({
+              type: actionTypes.LOGIN_MESSAGE,
+              payload: response.data.message
+            })
+          }
         })
         .catch(function (error) {
           console.log(error);

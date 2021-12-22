@@ -243,8 +243,7 @@ func (m *mongoDBRepo) CreateStory(id string, userStory models.UserStory) (string
 		Keys:    bson.M{"create_at": 1},
 		Options: options.Index().SetExpireAfterSeconds(3600),
 	}
-	test, err := collection.Indexes().CreateOne(ctx, index)
-	fmt.Println(index, test)
+	_, err = collection.Indexes().CreateOne(ctx, index)
 	if err != nil {
 		return "", err
 	}
@@ -284,13 +283,53 @@ func (m *mongoDBRepo) GetLastMeessage(id string) (models.Message, error) {
 	if err != nil {
 		return message, err
 	}
-	findOprions := options.FindOne()
-	findOprions.SetSort(bson.D{{"_id", -1}})
-	err = collection.FindOne(ctx, bson.D{{"room_id", roomID}}, findOprions).Decode(&message)
+	findOptions := options.FindOne()
+	findOptions.SetSort(bson.D{{"_id", -1}})
+	err = collection.FindOne(ctx, bson.D{{"room_id", roomID}}, findOptions).Decode(&message)
 	if err != nil {
 		return message, err
 	}
 	return message, nil
+}
+
+//SetOTP will set the otp to the user
+func (m *mongoDBRepo) SetOTP(user models.UserRegister) (string, error) {
+	collection := m.DB.Database("gochat").Collection("otps")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	user.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	user.ExpireOn = primitive.NewDateTimeFromTime(time.Now().Add(time.Minute * 10))
+	index := mongo.IndexModel{
+		Keys:    bson.M{"create_at": 1},
+		Options: options.Index().SetExpireAfterSeconds(600),
+	}
+	_, err := collection.Indexes().CreateOne(ctx, index)
+	if err != nil {
+		return "", err
+	}
+	_, err = collection.InsertOne(ctx, user)
+	if err != nil {
+		return "", err
+	}
+	return "OTP sent to given email address", nil
+}
+
+//ValidateOTP will give validate the OTP with latest otp
+func (m *mongoDBRepo) ValidateOTP(user models.UserRegister) (bool, error) {
+	var checkUser models.UserRegister
+	collection := m.DB.Database("gochat").Collection("otps")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	findOptions := options.FindOne()
+	findOptions.SetSort(bson.D{{"_id",-1}})
+	err := collection.FindOne(ctx, bson.D{{"email", user.Email}}, findOptions).Decode(&checkUser)
+	if err != nil {
+		return false,err
+	}
+	if checkUser.Code == user.Code {
+		return true, nil
+	}
+	return false, nil
 }
 
 func primtiveObjToString(id interface{}) string {

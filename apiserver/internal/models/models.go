@@ -20,8 +20,11 @@ type User struct {
 
 //UserRegister is for login model
 type UserRegister struct {
-	Email string
-	Code  string
+	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Email string `json:"email,omitempty" bson:"email,omitempty"`
+	Code  string `json:"code,omitempty" bson:"code,omitempty"`
+	CreatedAt primitive.DateTime `json:"create_at,omitempty" bson:"create_at,omitempty"`
+	ExpireOn  primitive.DateTime `json:"expire_on,omitempty" bson:"expire_on,omitempty"`
 }
 
 //Room is room model
@@ -86,4 +89,12 @@ type UserStory struct {
 	Token     string             `json:"token,omitempty" bson:"token,omitempty"`
 	CreatedAt primitive.DateTime `json:"create_at,omitempty" bson:"create_at,omitempty"`
 	ExpireOn  primitive.DateTime `json:"expire_on,omitempty" bson:"expire_on,omitempty"`
+}
+
+//MailData is our mail model
+type MailData struct {
+	From     string
+	To       string
+	Subject  string
+	Content  string
 }

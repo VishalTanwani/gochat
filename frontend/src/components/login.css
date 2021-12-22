@@ -17,7 +17,6 @@
 .login-container > p{
     margin-top: 5px;
     text-align: left;
-    color: red;
 }
 
 .login-container > img {
@@ -41,10 +40,17 @@
     border-bottom: 2px solid #00bfa5;
 }
 
+.login-form > form {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+}
+
 .login-form > form > input {
     outline: 0px;
     border: 0px;
     font-size: 15px;
+    width: 100%;
     background-color: white;
 }
 

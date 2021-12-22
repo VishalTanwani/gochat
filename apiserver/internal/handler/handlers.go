@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"strconv"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/asaskevich/govalidator"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
 	"github.com/VishalTanwani/gochat/apiserver/internal/helpers"
@@ -13,7 +15,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"math/rand"
 	"net/http"
-	"net/mail"
 	"sort"
 	"strings"
 	"time"
@@ -42,21 +43,68 @@ func NewRepo(a *config.AppConfig, db *driver.DB) {
 func (m *Repository) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	// w.Header().Set("Access-Control-Allow-Origin", "*")
-	var user models.User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	var temp models.UserRegister
+	err := json.NewDecoder(r.Body).Decode(&temp)
 	if err != nil {
 		m.App.ErrorLog.Println("error at decoding body")
 		helpers.ServerError(w, err)
 		return
 	}
-	_,err = mail.ParseAddress(user.Email)
-	if err!=nil {
+	check := govalidator.IsEmail(temp.Email)
+	if !check {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"meesage": "email is not valid" }`))
 		return
 	}
-	u, err := m.DB.GetUserByEmail(user.Email)
+	if temp.Code == "" {
+		rand.Seed(time.Now().UnixNano())
+		temp.Code = strconv.Itoa(rand.Intn(1000000)) 
+		message,err := m.DB.SetOTP(temp)
+		if err != nil {
+			m.App.ErrorLog.Println("error at setting otp for user")
+			helpers.ServerError(w, err)
+			return
+		}
+		htmlMessage := fmt.Sprintf(`
+		<html>
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+				<title>OTP for login in gochat</title>
+			</head>
+			<body>
+				dear user <br/> 
+				this is your otp <b>%s</b><br/>
+				this is valid for 10 minutes<br/>
+				do not share this with any one
+			</body>
+		</html>`,temp.Code)
+		msg := models.MailData{
+			From: "gochat34@gmail.com",
+			To: temp.Email,
+			Subject: "OTP for login in gochat",
+			Content: htmlMessage,
+		}
+		m.App.MailChan <- msg
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message" : "`+message+`"}`))
+		return
+	} else {
+		check,err := m.DB.ValidateOTP(temp)
+		if err!=nil {
+			m.App.ErrorLog.Println("error at validating otp for user")
+			helpers.ServerError(w, err)
+			return
+		}
+		if !check {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"message" : "otp is invalid"}`))
+			return
+		}
+	}
+	u, err := m.DB.GetUserByEmail(temp.Email)
 	if err != nil {
+		var user models.User
+		user.Email = temp.Email
 		user.CreatedAt = time.Now().Unix()
 		user.UpdatedAt = time.Now().Unix()
 		user.Status = "online"
@@ -759,13 +807,20 @@ func (m *Repository) CreateStoryForUser(w http.ResponseWriter, r *http.Request) 
 			helpers.ServerError(w, err)
 			return
 		}
-		temp.Token = ""
-		res, err := m.DB.CreateStory(fmt.Sprint(mapData["_id"]), temp)
-		if err == nil {
-			json.NewEncoder(w).Encode(res)
+		_,err = m.DB.GetStory(fmt.Sprint(mapData["_id"]))
+		if err!=nil {
+			temp.Token = ""
+			res, err := m.DB.CreateStory(fmt.Sprint(mapData["_id"]), temp)
+			if err == nil {
+				json.NewEncoder(w).Encode(res)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"meesage": "can not set story" }`))
+				return
+			}
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"meesage": "can not set story" }`))
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"meesage": "story is already there" }`))
 			return
 		}
 	} else {

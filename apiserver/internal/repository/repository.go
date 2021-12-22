@@ -22,4 +22,6 @@ type DatabaseRepo interface {
 	CreateStory(id string, userStory models.UserStory) (string, error)
 	GetStory(id string) (models.UserStory, error)
 	GetLastMeessage(id string) (models.Message, error)
+	SetOTP(user models.UserRegister) (string, error)
+	ValidateOTP(user models.UserRegister) (bool, error)
 }

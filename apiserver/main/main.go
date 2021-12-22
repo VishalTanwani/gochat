@@ -6,6 +6,7 @@ import (
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
 	"github.com/VishalTanwani/gochat/apiserver/internal/handler"
+	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"log"
 	"net/http"
 	"os"
@@ -30,6 +31,10 @@ func main() {
 		}
 	}()
 
+	defer close(app.MailChan)
+
+	go listenForMail()
+
 	server := &http.Server{
 		Addr:    port,
 		Handler: routes(),
@@ -42,6 +47,9 @@ func main() {
 }
 
 func run() (*driver.DB, error) {
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog

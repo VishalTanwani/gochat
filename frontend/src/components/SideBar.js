@@ -113,7 +113,7 @@ function SideBar(props) {
         {search === "" && searchRooms.length === 0
           ? userRooms &&
             userRooms.map((x, i) => (
-              <Conversation key={i} data={x} search={search} type="room" />
+              <Conversation key={i} data={x} search={search} setSearch={setSearch} type="room" />
             ))
           : null}
       </div>

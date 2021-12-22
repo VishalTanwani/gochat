@@ -33,8 +33,8 @@ function Conversation(props) {
         token: window.localStorage["token"],
       })
       type === "search" && await joinGroup(data._id)
-      await setSearch("")
     }
+    await setSearch("")
     await selectRoom(data._id);
   };
 

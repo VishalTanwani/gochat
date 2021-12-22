@@ -12,6 +12,7 @@ export const initialState = {
     image:  null,
     groupDescStatus: null,
     messages: [],
+    loginMessage: "",
 }
 
 export const actionTypes = {
@@ -28,7 +29,8 @@ export const actionTypes = {
     SEARCH_ROOM: "SEARCH_ROOM",
     SET_STORY: "SET_STORY",
     OPEN_STORY: "OPEN_STORY",
-    OPEN_IMAGE_VIEWER: "OPEN_IMAGE_VIEWER"
+    OPEN_IMAGE_VIEWER: "OPEN_IMAGE_VIEWER",
+    LOGIN_MESSAGE: "LOGIN_MESSAGE"
 }
 
 const reducer = (state, action) => {
@@ -105,6 +107,11 @@ const reducer = (state, action) => {
                 ...state,
                 imageViewerStatus: action.payload.status,
                 image: action.payload.image
+            }
+        case "LOGIN_MESSAGE":
+            return{
+                ...state,
+                loginMessage: action.payload
             }
         default:
             return state;

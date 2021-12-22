@@ -129,7 +129,7 @@ const Chat = () => {
   const joinRoom = () => {
     socket.send(
       JSON.stringify({
-        body: user.name + "<check> joined",
+        body: aes256.encrypt(currentRoom._id,user.name + "<check> joined"),
         user_id: user._id,
         user_name: user.name,
         type: "joinRoom",
@@ -143,7 +143,7 @@ const Chat = () => {
   const leavRoom = () => {
     socket.send(
       JSON.stringify({
-        body: user.name + "<check> left",
+        body: aes256.encrypt(currentRoom._id,user.name + "<check> left"),
         user_id: user._id,
         user_name: user.name,
         type: "leaveRoom",
