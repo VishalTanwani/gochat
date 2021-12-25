@@ -19,6 +19,7 @@ web socket is used for live chatting
 
 to run this whole application follow below steps
 ```bash
+  go get ./...
   cd apiserver/main
   go run *.go -email=email id -emailpass=email password -dbname=mongodb username -dbpass=mongodb password
 ```
@@ -30,6 +31,7 @@ to run this whole application follow below steps
 
 opne new terminal window in this application and write below command
 ```bash
+  go get ./...
   cd socket
   go run main.go
 ```
