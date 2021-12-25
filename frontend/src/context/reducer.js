@@ -62,10 +62,10 @@ const reducer = (state, action) => {
                 profileStatue: action.status
             }
         case "GROUP_DESC_OPENER":
-                return {
-                    ...state,
-                    groupDescStatus: action.status
-                }
+            return {
+                ...state,
+                groupDescStatus: action.status
+            }
         case "UPDATE_USER":
             return{
                 ...state,

@@ -43,3 +43,13 @@
     width: auto;
     height: 50vh;
 }
+@media only screen and (max-width: 500px) {
+    .image-viewer{
+        overflow: hidden;
+    }
+    .image-viewer-body > img {
+        padding: 0 20pxs;
+        width: auto;
+        height: 30vh;
+    }
+}

@@ -57,7 +57,7 @@ function SideBar(props) {
   }
 
   return (
-    <div className="sidebar">
+    <div className="sidebar" style={{order: currentRoom?2:1}}>
       <header className="header">
         <>
           <Avatar src={user && user.profile_image} onClick={profileClick} />
@@ -74,7 +74,6 @@ function SideBar(props) {
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
-              style={{top:"40px", left:"-50px"}}
               MenuListProps={{
                 'aria-labelledby': 'basic-button',
               }}

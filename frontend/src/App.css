@@ -9,3 +9,8 @@
   width: 100vw;
   background-color: #ededed;
 }
+@media only screen and (max-width: 500px) {
+  .app-container{
+    overflow: hidden;
+  }
+}

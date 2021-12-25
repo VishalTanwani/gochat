@@ -48,3 +48,8 @@
     border-radius: 9999px;
     float: right;
 }
+@media only screen and (max-width: 500px) {
+    .roomInfo > p{
+        width: 100%;
+    }
+}

@@ -41,7 +41,7 @@ function Story(props) {
         
         return (
             userStory && <div className="story" style={{backgroundColor: "#"+bgColor}} onLoad={() => timeOut()}>
-                <div className="story-cross" onClick={handleClose}>
+                <div className="story-cross1" onClick={handleClose}>
                     <CloseIcon/>
                 </div>
                 <div className="story-slider" >
@@ -50,6 +50,9 @@ function Story(props) {
                     </div>
                 </div>
                 <div className="user-story">
+                    <div className="story-cross2" onClick={handleClose}>
+                        <ArrowBackIcon/>
+                    </div>
                     <Avatar
                         src={user && user.profile_image}
                     />

@@ -370,6 +370,12 @@ export const StateProvider = ({ children }) => {
         type: actionTypes.OPEN_IMAGE_VIEWER,
         payload: {status, image}
       })
+    },
+    unSelectRoom: () => {
+      dispatch({
+        type: actionTypes.SET_ROOM,
+        payload: null,
+      });
     }
   };
   return (

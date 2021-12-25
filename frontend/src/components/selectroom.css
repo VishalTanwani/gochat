@@ -1,6 +1,7 @@
 .select-room {
     flex: 0.7 0 70%;
     display: flex;
+    order: 2;
     padding: 40px;
     flex-direction: column;
     justify-content: center;

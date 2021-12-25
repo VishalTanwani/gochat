@@ -3,6 +3,8 @@
     flex-direction: column;
     flex: 1 0 30%;
     overflow-y: scroll;
+    order: 2;
+
 }
 .group-desc-header{
     display: flex;
@@ -171,4 +173,13 @@
 .group-name-bottom-border {
     border-bottom: 2px solid #00bfa5;
     margin-bottom: 8px;
+}
+@media only screen and (max-width: 500px) {
+    .group-desc{
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 100%;
+        overflow-y: scroll;
+        order: 0;
+    }
 }

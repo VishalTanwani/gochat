@@ -2,11 +2,17 @@
     display: flex;
     width: 70vw;
     flex-direction: column;
+    order: 2;
 }
 .chat1{
     width: 40vw;
     display: flex;
     flex-direction: column;
+    order: 2;
+
+}
+.chat-header-unselect-room{
+    display: none;
 }
 .chatHeader{
     padding: 10px 16px;
@@ -141,4 +147,26 @@
     object-fit: cover;
     width: 200px;
     height: 200px;
+}
+@media only screen and (max-width: 500px) {
+    .chat{
+        display: flex;
+        width: 100vw;
+        z-index: 1;
+        order: 1;
+        flex-direction: column;
+    }
+    .chat-header-unselect-room {
+        display: block;
+    }
+    .chat-image{
+        object-fit: cover;
+        width: 180px;
+        height: 180px;
+    }
+    .chat1{
+        width: 0vw;
+        display: flex;
+        flex-direction: column;
+    }
 }

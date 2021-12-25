@@ -10,11 +10,12 @@ import MicIcon from "@material-ui/icons/Mic";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { StateContext } from "../context/StateProvider";
 import aws from "aws-sdk";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const socket = new WebSocket("ws://localhost:5000/ws");
 
 const Chat = () => {
-  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert, imageViewer } = useContext(
+  const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert, imageViewer, unSelectRoom } = useContext(
     StateContext
   );
 
@@ -159,6 +160,11 @@ const Chat = () => {
     <div className={groupDescStatus ? "chat1" : "chat"}>
       {currentRoom && (
         <header className="chatHeader" >
+          <div className="chat-header-unselect-room">
+            <IconButton onClick={unSelectRoom}>
+              <ArrowBackIcon/>
+            </IconButton>
+          </div>
           <Avatar src={currentRoom.group_icon} onClick={() => openGroupDesc(true)}/>
           <div className="chatHeaderData" onClick={() => openGroupDesc(true)}>
             <div>
