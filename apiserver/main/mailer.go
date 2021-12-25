@@ -5,7 +5,16 @@ import (
 	"github.com/xhit/go-simple-mail/v2"
 	"time"
 	"fmt"
+	// "flag"
 )
+
+var emailID string
+var emailPass string
+
+func setPass(email,pass *string){
+	emailID = *email
+	emailPass = *pass
+}
 
 func listenForMail(){
 	for {
@@ -18,8 +27,8 @@ func sendMail(m models.MailData) {
 	server := mail.NewSMTPClient()
 	server.Host = "smtp.gmail.com"
 	server.Port = 587
-	server.Username = "gochat34@gmail.com"
-	server.Password = "01090109"
+	server.Username = emailID
+	server.Password = emailPass
 	server.Encryption = mail.EncryptionSTARTTLS
 	server.KeepAlive = false
 	server.ConnectTimeout = 10 * time.Second

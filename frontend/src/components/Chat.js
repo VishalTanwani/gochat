@@ -70,16 +70,15 @@ const Chat = () => {
     evt.preventDefault();
     const file = evt.target.files[0];
     const targetFile = new Date().getTime().toString()
-    await sign(targetFile, file.type, file).then(res => {
+    sign(targetFile, file.type, file).then(res => {
       sendImage(res.Location);
     })
-    await openAlert(true,'image uploaded successfully',"success");
   }
 
   const sign = (filename, filetype, file) => new Promise((resolve, reject) => {
     var s3 = new aws.S3();
     var params = {
-        Bucket: "gochat-images",
+        Bucket: process.env.REACT_APP_AWS_S3_BUCKET,
         Key: filename+file.name,
         Body: file,
         Expires: 60,

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"flag"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
 	"github.com/VishalTanwani/gochat/apiserver/internal/handler"
@@ -59,9 +60,14 @@ func run() (*driver.DB, error) {
 
 	//connect to database
 	fmt.Println("Connecting to database...")
-	name := "vishal"
-	pass := "0109"
-	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@gochat.gcc8h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", name, pass)
+	email := flag.String("email","gochat34@gmail.com","email password")
+	emailPass := flag.String("emailpass","0109","email password")
+	name := flag.String("dbname","vishal","data base name")
+	pass := flag.String("dbpass","","data base password")
+	flag.Parse()
+	setPass(email,emailPass)
+
+	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@gochat.gcc8h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", *name, *pass)
 	db, err := driver.ConnectMongo(connectionString)
 	if err != nil {
 		log.Fatal("cannot connect to database ", err)
