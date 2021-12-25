@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"github.com/VishalTanwani/gochat/socket/websocket"
 	"log"
 	"net/http"
@@ -35,6 +36,10 @@ func setRoutes() {
 func main() {
 	fmt.Println("hello chat")
 	setRoutes()
-	fmt.Println("server is running at 5000 port")
-	log.Fatal(http.ListenAndServe(":5000", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+	fmt.Printf("server is running at %s port\n",port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

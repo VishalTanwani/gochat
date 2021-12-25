@@ -1,7 +1,7 @@
 let socket = {}
 var socketFunctions = {
     initialize: function() {
-        socket = new WebSocket("ws://localhost:5000/ws");
+        socket = new WebSocket(process.env.REACT_APP_SOCKET_CONNECTION_URL);
     },
     sendMessage: function(obj) {
         socket.send(

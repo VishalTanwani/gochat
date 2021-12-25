@@ -12,7 +12,7 @@ import { StateContext } from "../context/StateProvider";
 import aws from "aws-sdk";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-const socket = new WebSocket("ws://localhost:5000/ws");
+const socket = new WebSocket(process.env.REACT_APP_SOCKET_CONNECTION_URL);
 
 const Chat = () => {
   const { currentRoom, user, leftRoom, getMessages, messages, openGroupDesc, groupDescStatus, openAlert, imageViewer, unSelectRoom } = useContext(

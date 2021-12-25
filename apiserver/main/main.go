@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"flag"
 	"github.com/VishalTanwani/gochat/apiserver/internal/config"
 	"github.com/VishalTanwani/gochat/apiserver/internal/driver"
@@ -10,16 +11,17 @@ import (
 	"github.com/VishalTanwani/gochat/apiserver/internal/models"
 	"log"
 	"net/http"
-	"os"
 )
-
-const port = ":4000"
 
 var app config.AppConfig
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
 	fmt.Println("api server")
-	fmt.Println("server is running at", port)
+	fmt.Println("server is running at", ":"+port)
 	db, err := run()
 	if err != nil {
 		log.Println("error at run in main", err)
@@ -37,7 +39,7 @@ func main() {
 	go listenForMail()
 
 	server := &http.Server{
-		Addr:    port,
+		Addr:    ":"+port,
 		Handler: routes(),
 	}
 
