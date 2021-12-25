@@ -11,16 +11,16 @@ it has 3 modules
 
 ## Tech Stack
 
-**Client:** React, html, CSS, contextAPI
+**Client:** [React](https://reactjs.org/), html, CSS, [contextAPI](https://reactjs.org/docs/context.html)
 
-**Server:** Golang
+**Server:** [Golang](https://go.dev/doc/install)
 
-web socket is used for live chatting
+[web socket](https://www.geeksforgeeks.org/what-is-web-socket-and-how-it-is-different-from-the-http/) is used for live chatting
 
 to run this whole application follow below steps
 ```bash
-  go get ./...
   cd apiserver/main
+  go get ./...
   go run *.go -email=email id -emailpass=email password -dbname=mongodb username -dbpass=mongodb password
 ```
 
@@ -31,8 +31,8 @@ to run this whole application follow below steps
 
 opne new terminal window in this application and write below command
 ```bash
-  go get ./...
   cd socket
+  go get ./...
   go run main.go
 ```
 this is to run socket connection.
@@ -41,9 +41,10 @@ now go to frontend directory and create .env file and content of that file will 
 
 ```bash
 REACT_APP_API_ENDPOINT = "http://localhost:4000"
-REACT_APP_ACCESS_ID = "ur aws access id"
+REACT_APP_ACCESS_ID = "your aws access id"
 REACT_APP_ACCESS_KEY = "your aws secret access key"
 REACT_APP_AWS_S3_BUCKET = "and your aws s3 bucket"
+REACT_APP_SOCKET_CONNECTION_URL = "ws://localhost:5000/ws"
 ```
 we are using aws s3 bucket for sharing images.
 
@@ -56,7 +57,4 @@ opne new terminal window in this application and write below command
 
 this is to run frontend 
 
-u have all 3 modules running in localhost 3000,4000,5000 respectively
-
-
-
+you have all 3 modules running in localhost 3000,4000,5000 respectively
