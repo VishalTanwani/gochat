@@ -8,6 +8,7 @@ it has 3 modules
 - [socket](https://github.com/VishalTanwani/gochat/tree/main/socket)
 - [frontend](https://github.com/VishalTanwani/gochat/tree/main/frontend)
 
+this is [live](https://gochat-react.herokuapp.com/) now 
 
 ## Tech Stack
 
